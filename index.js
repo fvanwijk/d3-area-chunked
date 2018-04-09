@@ -1,3 +1,3 @@
 export {
-  default as lineChunked,
-} from './src/lineChunked';
+  default as areaChunked,
+} from './src/areaChunked';

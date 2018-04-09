@@ -21,9 +21,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, 1], [1, 2], [2, null], [3, null], [4, 1], [5, null], [6, 2], [7, 3], [8, null], [9, 1], [10, 1]];
@@ -39,10 +40,11 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .curve(d3.curveMonotoneX)
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, 1], [1, 2], [2, null], [3, null], [4, 1], [5, null], [6, 2], [7, 3], [8, null], [9, 1], [10, 1]];
@@ -58,9 +60,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, 1], [2, 2], [4, 1], [10, 0]];
@@ -76,10 +79,11 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
-          .lineStyles({ 'stroke-width': '10px' })
+        var chunked = d3.areaChunked()
+          .areaStyles({ 'stroke-width': '10px' })
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, null], [1, null], [2, 1], [3, 3], [4, 2], [5, 2], [6, 0], [7, 1], [8, 1], [9, null], [10, null]];
@@ -95,9 +99,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .extendEnds(x.range());
 
@@ -107,18 +112,19 @@
       },
     },
     {
-      label: 'Lines along top and bottom edges',
+      label: 'Areas along top and bottom edges',
       render: function topBottomEdges(root) {
         var g = root.append('svg')
           .attr('width', exampleWidth)
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
-          .lineStyles({ 'stroke-width': 4 });
+          .areaStyles({ 'stroke-width': 4 });
 
         var data = [[0, 0], [4, 0], [5, 2], [6, 2], [7, 4], [10, 4]];
 
@@ -133,9 +139,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, 1]];
@@ -151,9 +158,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [];
@@ -169,9 +177,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, null]];
@@ -187,9 +196,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, null], [1, null], [2, null], [3, null]];
@@ -205,9 +215,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .accessData(data => data.results);
 
@@ -224,25 +235,25 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .chunkDefinitions({
-            line: {
+            area: {
               styles: {
-                stroke: '#0bb',
+                fill: '#0bb',
               },
             },
             gap: {
               styles: {
-                stroke: 'none'
+                fill: 'none'
               }
             },
             chunk1: {
               styles: {
-                'stroke-dasharray': '2, 2',
-                'stroke-opacity': 0.35,
+                'fill-opacity': 0.35,
               },
               pointStyles: {
                 'fill': '#fff',
@@ -250,7 +261,7 @@
               }
             }
           })
-          .chunk(function (d) { return d[1] > 1 ? 'chunk1' : 'line'; });
+          .chunk(function (d) { return d[1] > 1 ? 'chunk1' : 'area'; });
 
         var data = [[0, 2], [1, 1], [2, 2], [3, null], [3.5, 1], [4, 0.8], [4.5, null], [5, 1], [6, 2], [7, 1], [7.5, 1], [8, null], [9, 2], [10, null]];
 
@@ -265,22 +276,23 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        const chunked = d3.lineChunked()
+        const chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .chunkDefinitions({
-            line: {
-              styles: { stroke: 'red' },
+            area: {
+              styles: { fill: 'red' },
             },
             gap: {
-              styles: { stroke: 'silver' },
+              styles: { fill: 'silver' },
             },
             chunk1: {
-              styles: { stroke: 'blue' },
+              styles: { fill: 'blue' },
             },
           })
-          .chunk(function (d) { return d[1] > 1 ? 'chunk1' : 'line'; });
+          .chunk(function (d) { return d[1] > 1 ? 'chunk1' : 'area'; });
 
         const data = [[0, 2], [1, 1], [2, 2], [3, null], [4, 1], [5, 2], [6, 1], [7, 1], [8, null], [9, 2], [10, null]];
 
@@ -296,9 +308,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
           .transitionInitial(true);
@@ -317,9 +330,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
           .transitionInitial(false);
@@ -342,9 +356,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
           .transitionInitial(false);
@@ -367,9 +382,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .extendEnds(x.range())
           .debug(transitionDebug)
@@ -385,17 +401,18 @@
       },
     },
     {
-      label: 'Transition: gap to line',
+      label: 'Transition: gap to area',
       transition: true,
-      render: function gapToLine(root) {
+      render: function gapToArea(root) {
         var g = root.append('svg')
           .attr('width', exampleWidth)
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
           .transitionInitial(false);
@@ -418,9 +435,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .isNext(function (prev, curr) { return curr[0] === prev[0] + 1; })
           .debug(transitionDebug)
           .transitionInitial(false);
@@ -453,9 +471,10 @@
           .domain([2, 230])
           .range([exampleHeight - 10, 10]);
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d.x); })
-          .y(function (d) { return y(d.y); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d.y); })
           .defined(function (d) { return d.y != null; })
           .debug(transitionDebug)
           .transitionInitial(false);
@@ -470,7 +489,7 @@
       },
     },
     {
-      label: 'Multiple lines',
+      label: 'Multiple areas',
       transition: true,
       render: function endSegmentOverlap(root) {
         var g = root.append('svg')
@@ -490,13 +509,14 @@
 
         var color = d3.scaleOrdinal(d3.schemeCategory10);
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d.x); })
-          .y(function (d) { return y(d.y); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d.y); })
           .defined(function (d) { return d.y != null; })
           .debug(transitionDebug)
-          .lineStyles({
-            stroke: (d, i) => color(i),
+          .areaStyles({
+            fill: (d, i) => color(i),
           })
           .transitionInitial(true);
 
@@ -536,9 +556,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
         var data = [[0, null]];
@@ -555,9 +576,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
           .transitionInitial(false);
@@ -580,9 +602,10 @@
           .attr('height', exampleHeight)
           .append('g');
 
-        var chunked = d3.lineChunked()
+        var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y(function (d) { return y(d[1]); })
+          .y0(function (d) { return y.range()[0]; })
+          .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .isNext(function (prev, curr) { return curr[0] === prev[0] + 1; })
           .debug(transitionDebug)

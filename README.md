@@ -1,46 +1,49 @@
 # d3-area-chunked
 
-**:warning: :construction: This is a WIP fork of pbeshai/d3-line-chunked**
+**:warning: :construction: This is a WIP fork of [pbeshai/d3-line-chunked](pbeshai/d3-line-chunked)**
 
-[![npm version](https://badge.fury.io/js/d3-line-chunked.svg)](https://badge.fury.io/js/d3-line-chunked)
+[![npm version](https://badge.fury.io/js/d3-area-chunked.svg)](https://badge.fury.io/js/d3-area-chunked)
 
-A d3 plugin that renders a line with potential gaps in the data by styling the gaps differently from the defined areas. It also provides the ability to style arbitrary chunks of the defined data differently. Single points are rendered as circles and transitions are supported.
+A d3 plugin that renders an area with potential gaps in the data by styling the gaps differently from the defined areas. It also provides the ability to style arbitrary chunks of the defined data differently. Single points are rendered as circles and transitions are supported.
 
 Blog: [Showing Missing Data in Line Charts](https://bocoup.com/weblog/showing-missing-data-in-line-charts)
 
-Demo: http://peterbeshai.com/vis/d3-line-chunked/
+<!--Demo: http://frankvanwijk.nl/d3-area-chunked/-->
 
-![d3-line-chunked-demo](https://cloud.githubusercontent.com/assets/793847/18075172/806683f4-6e40-11e6-96bc-e0250adf0529.gif)
+<!-- TODO: create new GIF -->
+![d3-area-chunked-demo](https://cloud.githubusercontent.com/assets/793847/18075172/806683f4-6e40-11e6-96bc-e0250adf0529.gif)
 
 ## Example Usage
 
 ```js
-var lineChunked = d3.lineChunked()
+var areaChunked = d3.areaChunked()
   .x(function (d) { return xScale(d.x); })
-  .y(function (d) { return yScale(d.y); })
+  .y0(function (d) { return yScale.range()[0]; })
+  .y1(function (d) { return yScale(d.y); })
   .curve(d3.curveLinear)
   .defined(function (d) { return d.y != null; })
-  .lineStyles({
-    stroke: '#0bb',
+  .areaStyles({
+    fill: '#0bb',
   });
 
 d3.select('svg')
   .append('g')
-    .datum(lineData)
+    .datum(areaData)
     .transition()
     .duration(1000)
-    .call(lineChunked);
+    .call(areaChunked);
 ```
 
-### Example with multiple lines
+### Example with multiple areas
 
 ```js
-var lineChunked = d3.lineChunked()
+var areaChunked = d3.areaChunked()
   .x(function (d) { return xScale(d.x); })
-  .y(function (d) { return yScale(d.y); })
+  .y0(function (d) { return yScale.range()[0]; })
+  .y1(function (d) { return yScale(d.y); })
   .defined(function (d) { return d.y != null; })
-  .lineStyles({
-    stroke: (d, i) => colorScale(i),
+  .areaStyles({
+    fill: (d, i) => colorScale(i),
   });
 
 var data = [
@@ -52,13 +55,13 @@ var data = [
 // bind data
 var binding = d3.select('svg').selectAll('g').data(data);
 
-// append a `<g>` for each line
+// append a `<g>` for each area
 var entering = binding.enter().append('g');
 
-// call lineChunked on enter + update
+// call areaChunked on enter + update
 binding.merge(entering)
   .transition()
-  .call(lineChunked);
+  .call(areaChunked);
 
 // remove `<g>` when exiting
 binding.exit().remove();
@@ -84,7 +87,7 @@ Go to http://localhost:8000
 
 ## Installing
 
-If you use NPM, `npm install d3-line-chunked`. Otherwise, download the [latest release](https://github.com/pbeshai/d3-line-chunked/releases/latest).
+If you use NPM, `npm install d3-area-chunked`. Otherwise, download the [latest release](https://github.com/fvanwijk/d3-area-chunked/releases/latest).
 
 Note that this project relies on the following d3 features and plugins:
 - [d3-array](https://github.com/d3/d3-array)
@@ -99,34 +102,39 @@ The only thing not included in the default d3 v4 build is the plugin [d3-interpo
 
 ## API Reference
 
-<a href="#lineChunked" name="lineChunked">#</a> d3.**lineChunked**()
+<a href="#areaChunked" name="areaChunked">#</a> d3.**areaChunked**()
 
-Constructs a new generator for chunked lines with the default settings.
-
-
-<a href="#_lineChunked" name="_lineChunked">#</a> *lineChunked*(*context*)
-
-Render the chunked line to the given *context*, which may be either a [d3 selection](https://github.com/d3/d3-selection)
-of SVG containers (either SVG or G elements) or a corresponding [d3 transition](https://github.com/d3/d3-transition). Reads the data for the line from the `datum` property on the  container.
+Constructs a new generator for chunked areas with the default settings.
 
 
-<a href="#lineChunked_x" name="lineChunked_x">#</a> *lineChunked*.**x**([*x*])
+<a href="#_areaChunked" name="_areaChunked">#</a> *areaChunked*(*context*)
 
-Define an accessor for getting the `x` value for a data point. See [d3 line.x](https://github.com/d3/d3-shape#line_x) for details.
-
-
-<a href="#lineChunked_y" name="lineChunked_y">#</a> *lineChunked*.**y**([*y*])
-
-Define an accessor for getting the `y` value for a data point. See [d3 line.y](https://github.com/d3/d3-shape#line_y) for details.
+Render the chunked area to the given *context*, which may be either a [d3 selection](https://github.com/d3/d3-selection)
+of SVG containers (either SVG or G elements) or a corresponding [d3 transition](https://github.com/d3/d3-transition). Reads the data for the area from the `datum` property on the  container.
 
 
-<a href="#lineChunked_curve" name="lineChunked_curve">#</a> *lineChunked*.**curve**([*curve*])
+<a href="#areaChunked_x" name="areaChunked_x">#</a> *areaChunked*.**x**([*x*])
 
-Get or set the [d3 curve factory](https://github.com/d3/d3-shape#curves) for the line. See [d3 line.curve](https://github.com/d3/d3-shape#line_curve) for details.
-Define an accessor for getting the `curve` value for a data point. See [d3 line.curve](https://github.com/d3/d3-shape#line_curve) for details.
+Define an accessor for getting the `x` value for a data point. See [d3 area.x](https://github.com/d3/d3-shape#area_x) for details.
 
 
-<a href="#lineChunked_defined" name="lineChunked_defined">#</a> *lineChunked*.**defined**([*defined*])
+<a href="#areaChunked_y0" name="areaChunked_y0">#</a> *areaChunked*.**y0**([*y0*])
+
+Define an accessor for getting the `y0` value for a data point. See [d3 area.y0](https://github.com/d3/d3-shape#area_y0) for details.
+
+
+<a href="#areaChunked_y1" name="areaChunked_y1">#</a> *areaChunked*.**y1**([*y1*])
+
+Define an accessor for getting the `y1` value for a data point. See [d3 area.y1](https://github.com/d3/d3-shape#area_y1) for details.
+
+
+<a href="#areaChunked_curve" name="areaChunked_curve">#</a> *areaChunked*.**curve**([*curve*])
+
+Get or set the [d3 curve factory](https://github.com/d3/d3-shape#curves) for the area. See [d3 area.curve](https://github.com/d3/d3-shape#area_curve) for details.
+Define an accessor for getting the `curve` value for a data point. See [d3 area.curve](https://github.com/d3/d3-shape#area_curve) for details.
+
+
+<a href="#areaChunked_defined" name="areaChunked_defined">#</a> *areaChunked*.**defined**([*defined*])
 
 Get or set *defined*, a function that given a data point (`d`) returns `true` if the data is defined for that point and `false` otherwise. This function is important for determining where gaps are in the data when your data includes points without data in them.
 
@@ -148,7 +156,7 @@ The default returns `true` for all points.
 
 
 
-<a href="#lineChunked_isNext" name="lineChunked_isNext">#</a> *lineChunked*.**isNext**([*isNext*])
+<a href="#areaChunked_isNext" name="areaChunked_isNext">#</a> *areaChunked*.**isNext**([*isNext*])
 
 Get or set *isNext*, a function to determine if a data point follows the previous. This function enables detecting gaps in the data when there is an unexpected jump.
 
@@ -171,84 +179,81 @@ It is only necessary to define this if your data doesn't explicitly include gaps
 The default returns `true` for all points.
 
 
-<a href="#lineChunked_transitionInitial" name="lineChunked_transitionInitial">#</a> *lineChunked*.**transitionInitial**([*transitionInitial*])
+<a href="#areaChunked_transitionInitial" name="areaChunked_transitionInitial">#</a> *areaChunked*.**transitionInitial**([*transitionInitial*])
 
-Get or set *transitionInitial*, a boolean flag that indicates whether to perform a transition on initial render or not. If true and the *context* that *lineChunked* is called in is a transition, then the line will animate its y value on initial render. If false, the line will appear rendered immediately with no animation on initial render. This does not affect any subsequent renders and their respective transitions.
+Get or set *transitionInitial*, a boolean flag that indicates whether to perform a transition on initial render or not. If true and the *context* that *areaChunked* is called in is a transition, then the area will animate its y1 value on initial render. If false, the area will appear rendered immediately with no animation on initial render. This does not affect any subsequent renders and their respective transitions.
 
 The default value is `true`.
 
-<a href="#lineChunked_extendEnds" name="lineChunked_extendEnds">#</a> *lineChunked*.**extendEnds**([*[xMin, xMax]*])
+<a href="#areaChunked_extendEnds" name="areaChunked_extendEnds">#</a> *areaChunked*.**extendEnds**([*[xMin, xMax]*])
 
 Get or set *extendEnds*, an array `[xMin, xMax]` specifying the minimum and maximum x pixel values
-(e.g., `xScale.range()`). If defined, the undefined line will extend to the values provided,
+(e.g., `xScale.range()`). If defined, the undefined area will extend to the values provided,
 otherwise it will end at the last defined points.
 
 
-<a href="#lineChunked_accessData" name="lineChunked_accessData">#</a> *lineChunked*.**accessData**([*accessData*])
+<a href="#areaChunked_accessData" name="areaChunked_accessData">#</a> *areaChunked*.**accessData**([*accessData*])
 
-Get or set *accessData*, a function that specifies how to map from a dataset entry to the array of line data. This is only useful if your input data doesn't use the standard form of `[point1, point2, point3, ...]`. For example, if you pass in your data as `{ results: [point1, point2, point3, ...] }`, you would want to set accessData to `data => data.results`. For convenience, if your accessData function simply accesses a key of an object, you can pass it in directly: `accessData('results')` is equivalent to `accessData(data => data.results)`.
+Get or set *accessData*, a function that specifies how to map from a dataset entry to the array of area data. This is only useful if your input data doesn't use the standard form of `[point1, point2, point3, ...]`. For example, if you pass in your data as `{ results: [point1, point2, point3, ...] }`, you would want to set accessData to `data => data.results`. For convenience, if your accessData function simply accesses a key of an object, you can pass it in directly: `accessData('results')` is equivalent to `accessData(data => data.results)`.
 
 The default value is the identity function `data => data`.
 
 
-<a href="#lineChunked_lineStyles" name="lineChunked_lineStyles">#</a> *lineChunked*.**lineStyles**([*lineStyles*])
+<a href="#areaChunked_areaStyles" name="areaChunked_areaStyles">#</a> *areaChunked*.**areaStyles**([*areaStyles*])
 
-Get or set *lineStyles*, an object mapping style keys to style values to be applied to both defined and undefined lines. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_styles).
-
-
-
-<a href="#lineChunked_lineAttrs" name="lineChunked_lineAttrs">#</a> *lineChunked*.**lineAttrs**([*lineAttrs*])
-
-Get or set *lineAttrs*, an object mapping attribute keys to attribute values to be applied to both defined and undefined lines. The passed in *lineAttrs* are merged with the defaults. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_attrs).
-
-The default attrs are:
-
-```js
-{
-  fill: 'none',
-  stroke: '#222',
-  'stroke-width': 1.5,
-  'stroke-opacity': 1,
-}
-```
+Get or set *areaStyles*, an object mapping style keys to style values to be applied to both defined and undefined areas. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_styles).
 
 
 
-<a href="#lineChunked_gapStyles" name="lineChunked_gapStyles">#</a> *lineChunked*.**gapStyles**([*gapStyles*])
+<a href="#areaChunked_areaAttrs" name="areaChunked_areaAttrs">#</a> *areaChunked*.**areaAttrs**([*areaAttrs*])
 
-Get or set *gapStyles*, an object mapping style keys to style values to be applied only to undefined lines. It overrides values provided in *lineStyles*. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_styles).
-
-
-
-<a href="#lineChunked_gapAttrs" name="lineChunked_gapAttrs">#</a> *lineChunked*.**gapAttrs**([*gapAttrs*])
-
-Get or set *gapAttrs*, an object mapping attribute keys to attribute values to be applied only to undefined lines. It overrides values provided in *lineAttrs*. The passed in *gapAttrs* are merged with the defaults. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_attrs).
+Get or set *areaAttrs*, an object mapping attribute keys to attribute values to be applied to both defined and undefined areas. The passed in *areaAttrs* are merged with the defaults. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_attrs).
 
 The default attrs are:
 
 ```js
 {
-  'stroke-dasharray': '2 2',
-  'stroke-opacity': 0.2,
+  fill: '#222',
+  'fill-opacity': 1,
 }
 ```
 
 
-<a href="#lineChunked_pointStyles" name="lineChunked_pointStyles">#</a> *lineChunked*.**pointStyles**([*pointStyles*])
+
+<a href="#areaChunked_gapStyles" name="areaChunked_gapStyles">#</a> *areaChunked*.**gapStyles**([*gapStyles*])
+
+Get or set *gapStyles*, an object mapping style keys to style values to be applied only to undefined areas. It overrides values provided in *areaStyles*. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_styles).
+
+
+
+<a href="#areaChunked_gapAttrs" name="areaChunked_gapAttrs">#</a> *areaChunked*.**gapAttrs**([*gapAttrs*])
+
+Get or set *gapAttrs*, an object mapping attribute keys to attribute values to be applied only to undefined areas. It overrides values provided in *areaAttrs*. The passed in *gapAttrs* are merged with the defaults. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_attrs).
+
+The default attrs are:
+
+```js
+{
+  'fill-opacity': 0.2,
+}
+```
+
+
+<a href="#areaChunked_pointStyles" name="areaChunked_pointStyles">#</a> *areaChunked*.**pointStyles**([*pointStyles*])
 
 Get or set *pointStyles*, an object mapping style keys to style values to be applied to points. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_styles).
 
 
 
-<a href="#lineChunked_pointAttrs" name="lineChunked_pointAttrs">#</a> *lineChunked*.**pointAttrs**([*pointAttrs*])
+<a href="#areaChunked_pointAttrs" name="areaChunked_pointAttrs">#</a> *areaChunked*.**pointAttrs**([*pointAttrs*])
 
-Get or set *pointAttrs*, an object mapping attr keys to attr values to be applied to points (circles). Note that if fill is not defined in *pointStyles* or *pointAttrs*, it will be read from the stroke color on the line itself. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_attrs).
+Get or set *pointAttrs*, an object mapping attr keys to attr values to be applied to points (circles). Note that if fill is not defined in *pointStyles* or *pointAttrs*, it will be read from the fill color on the area itself. Uses syntax similar to [d3-selection-multi](https://github.com/d3/d3-selection-multi#selection_attrs).
 
 
 
-<a href="#lineChunked_chunk" name="lineChunked_chunk">#</a> *lineChunked*.**chunk**([*chunk*])
+<a href="#areaChunked_chunk" name="areaChunked_chunk">#</a> *areaChunked*.**chunk**([*chunk*])
 
-Get or set *chunk*, a function that given a data point (`d`) returns the name of the chunk it belongs to. This is necessary if you want to have multiple styled chunks of the defined data. There are two reserved chunk names: `"line"` for the default line for defined data, and `"gap"` for undefined data. It is not recommended that you use `"gap"` in this function. The default value maps all data points to `"line"`.
+Get or set *chunk*, a function that given a data point (`d`) returns the name of the chunk it belongs to. This is necessary if you want to have multiple styled chunks of the defined data. There are two reserved chunk names: `"area"` for the default area for defined data, and `"gap"` for undefined data. It is not recommended that you use `"gap"` in this function. The default value maps all data points to `"area"`.
 
 For example, if you wanted all points with y values less than 10 to be in the `"below-threshold"` chunk, you could do the following:
 
@@ -258,32 +263,32 @@ var data = [{ x: 1, y: 5 }, { x: 2, y: 8 }, { x: 3, y: 12 }, { x: 4, y: 15 }, { 
 
 // inspects the y value to determine which chunk to use.
 function chunk(d) {
-  return d.y < 10 ? 'below-threshold' : 'line';
+  return d.y < 10 ? 'below-threshold' : 'area';
 }
 ```
 
 
-<a href="#lineChunked_chunkLineResolver" name="lineChunked_chunkLineResolver">#</a> *lineChunked*.**chunkLineResolver**([*chunkLineResolver*])
+<a href="#areaChunked_chunkAreaResolver" name="areaChunked_chunkAreaResolver">#</a> *areaChunked*.**chunkAreaResolver**([*chunkAreaResolver*])
 
-Get or set *chunkLineResolver*, a function that decides what chunk the line should be rendered in when given two adjacent defined points that may or may not be in the same chunk via `chunk()`. The function takes three parameters:
+Get or set *chunkAreaResolver*, a function that decides what chunk the area should be rendered in when given two adjacent defined points that may or may not be in the same chunk via `chunk()`. The function takes three parameters:
 
   * chunkNameLeft (*String*): The name of the chunk for the point on the left
   * chunkNameRight (*String*): The name of the chunk for the point on the right
   * chunkNames (*String[]*): The ordered list of chunk names from chunkDefinitions
 
-It returns the name of the chunk that the line segment should be rendered in. By default it uses the order of the keys in the chunkDefinition object..
+It returns the name of the chunk that the area segment should be rendered in. By default it uses the order of the keys in the chunkDefinition object..
 
-For example, if you wanted all lines between two different chunks to use the styling of the chunk that the left point belongs to, you could define *chunkLineResolver* as follows:
+For example, if you wanted all areas between two different chunks to use the styling of the chunk that the left point belongs to, you could define *chunkAreaResolver* as follows:
 
 ```js
 // always take the chunk of the item on the left
-function chunkLineResolver(chunkNameA, chunkNameB, chunkNames) {
+function chunkAreaResolver(chunkNameA, chunkNameB, chunkNames) {
   return chunkNameA;
 }
 ```
 
 
-<a href="#lineChunked_chunkDefinitions" name="lineChunked_chunkDefinitions">#</a> *lineChunked*.**chunkDefinitions**([*chunkDefinitions*])
+<a href="#areaChunked_chunkDefinitions" name="areaChunked_chunkDefinitions">#</a> *areaChunked*.**chunkDefinitions**([*chunkDefinitions*])
 
 Get or set *chunkDefinitions*, an object mapping chunk names to styling and attribute assignments for each chunk. The format is as follows:
 
@@ -299,28 +304,27 @@ Get or set *chunkDefinitions*, an object mapping chunk names to styling and attr
 }
 ```
 
-Note that by using the reserved chunk names `"line"` and `"gap"`, you can accomplish the equivalent of setting `lineStyles`, `lineAttrs`, `gapStyles`, `gapAttrs`, `pointStyles`, and `pointAttrs` individually. Chunks default to reading settings defined for the chunk `"line"` (or by `lineStyles`, `lineAttrs`), so you can place base styles for  all chunks there and not have to duplicate them.
+Note that by using the reserved chunk names `"area"` and `"gap"`, you can accomplish the equivalent of setting `areaStyles`, `areaAttrs`, `gapStyles`, `gapAttrs`, `pointStyles`, and `pointAttrs` individually. Chunks default to reading settings defined for the chunk `"area"` (or by `areaStyles`, `areaAttrs`), so you can place base styles for all chunks there and not have to duplicate them.
 
 Full multiple chunks example:
 
 ```js
-const lineChunked = d3.lineChunked()
+const areaChunked = d3.areaChunked()
   .defined(function (d) { return d[1] !== null; })
   .chunkDefinitions({
-    line: {
+    area: {
       styles: {
-        stroke: '#0bb',
+        fill: '#0bb',
       },
     },
     gap: {
       styles: {
-        stroke: 'none'
+        fill: 'none'
       }
     },
     'below-threshold': {
       styles: {
-        'stroke-dasharray': '2, 2',
-        'stroke-opacity': 0.35,
+        'fill-opacity': 0.35,
       },
       pointStyles: {
         'fill': '#fff',
@@ -328,5 +332,5 @@ const lineChunked = d3.lineChunked()
       }
     }
   })
-  .chunk(function (d) { return d[1] < 2 ? 'below-threshold' : 'line'; });
+  .chunk(function (d) { return d[1] < 2 ? 'below-threshold' : 'area'; });
 ```

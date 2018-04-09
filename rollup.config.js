@@ -16,7 +16,7 @@ export default {
   globals: globals,
   external: Object.keys(globals),
   targets: [
-    { format: 'umd', dest: 'build/d3-line-chunked.js' },
-    { format: 'umd', dest: 'example/d3-line-chunked.js' },
+    { format: 'umd', dest: 'build/d3-area-chunked.js' },
+    { format: 'umd', dest: 'example/d3-area-chunked.js' },
   ]
 };

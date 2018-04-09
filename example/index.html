@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>d3-line-chunked</title>
+    <title>d3-area-chunked</title>
     <meta charset="utf-8">
     <link rel="stylesheet" href="example.css" />
   </head>
   <body>
-    <h1 class="main-header">d3-line-chunked</h1>
-    <p class="main-link"><a href="https://github.com/pbeshai/d3-line-chunked">https://github.com/pbeshai/d3-line-chunked</a></p>
+    <h1 class="main-header">d3-area-chunked</h1>
+    <p class="main-link"><a href="https://github.com/fvanwijk/d3-area-chunked">https://github.com/fvanwijk/d3-area-chunked</a></p>
     <div class='chart-container'></div>
     <p>
-      <a href="https://github.com/pbeshai/d3-line-chunked">Code on GitHub</a>
+      <a href="https://github.com/fvanwijk/d3-area-chunked">Code on GitHub</a>
     </p>
     <div class='example-gallery'><h2>Example Cases</h2></div>
     <script src="//d3js.org/d3.v4.min.js"></script>
     <script src="d3-interpolate-path.js"></script>
-    <script src="d3-line-chunked.js"></script>
+    <script src="d3-area-chunked.js"></script>
     <script src="example-gallery.js"></script>
     <script>
 var transitionDuration = 1000;
 
 // shared chart properties
-var x, y, xAxis, yAxis, svg, line, lineWithDefined, width, height;
-var lineColor = '#0bb';
+var x, y, xAxis, yAxis, svg, area, areaWithDefined, width, height;
+var areaColor = '#0bb';
 
 /* eslint-disable */
 function generateRandom(length) {
@@ -68,38 +68,40 @@ function setupChart(data) {
     .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
 
-  line = d3.line()
+  area = d3.area()
       .curve(d3.curveLinear)
       .x(function (d) { return x(d.x); })
-      .y(function (d) { return y(d.y); });
+      .y0(function (d) { return y(0); })
+      .y1(function (d) { return y(d.y); });
 
-  lineWithDefined = d3.line()
+  areaWithDefined = d3.area()
       .curve(d3.curveLinear)
       .x(function (d) { return x(d.x); })
-      .y(function (d) { return y(d.y); })
+      .y0(function (d) { return y(0); })
+      .y1(function (d) { return y(d.y); })
       .defined(function (d) { return d.y != null; });
 
   svg.append('g')
       .attr('class', 'ref-lines');
 
   svg.append('g')
-      .attr('class', 'basic-line')
+      .attr('class', 'basic-area')
       .append('text')
-        .text('d3.line')
+        .text('d3.area')
         .attr('dy', -8);
 
   svg.append('g')
-      .attr('class', 'basic-line-defined')
+      .attr('class', 'basic-area-defined')
       .attr('transform', 'translate(0 ' + (groupHeight) + ')')
       .append('text')
-        .text('d3.line with defined()')
+        .text('d3.area with defined()')
         .attr('dy', -8);
 
   svg.append('g')
-    .attr('class', 'chunked-line')
+    .attr('class', 'chunked-area')
     .attr('transform', 'translate(0 ' + (2 * groupHeight) + ')')
     .append('text')
-        .text('d3-line-chunked')
+        .text('d3-area-chunked')
         .style('font-weight', 'bold')
         .attr('dy', -8);
 
@@ -110,41 +112,41 @@ function setupChart(data) {
   updateChart(data);
 }
 
-
-function renderChunkedLine(lineData, root) {
-  var lineChunked = d3.lineChunked()
+function renderChunkedArea(lineData, root) {
+  var areaChunked = d3.areaChunked()
     .x(function (d) { return x(d.x); })
-    .y(function (d) { return y(d.y); })
+    .y0(function (d) { return y(0); })
+    .y1(function (d) { return y(d.y); })
     .curve(d3.curveLinear)
     .defined(function (d) { return d.y != null; })
-    .lineStyles({
-      stroke: '#0bb',
+    .areaStyles({
+      fill: '#0bb'
     });
 
   root
     .datum(lineData)
     .transition()
     .duration(transitionDuration)
-    .call(lineChunked);
+    .call(areaChunked);
 }
 
-function renderBasicLine(newData, root, line, showPoints) {
-  // render basic line
-  var basicLine = root.select('path');
+function renderBasicArea(newData, root, area, showPoints) {
+  // render basic area
+  var basicArea = root.select('path');
 
-  if (basicLine.empty()) {
-    basicLine = root.append('path')
+  if (basicArea.empty()) {
+    basicArea = root.append('path')
       .style('opacity', 1e-6);
   }
 
-  basicLine
-      .style('fill', 'none')
-      .style('stroke', lineColor)
+  basicArea
+      .style('fill', areaColor)
+      //.style('stroke', '#ccc') // debug
       .style('stroke-width', 2)
       .transition()
       .duration(transitionDuration)
       .style('opacity', 1)
-      .attr('d', line(newData));
+      .attr('d', area(newData));
 
   if (showPoints) {
     var filteredData = newData.filter(function (d) { return d.y != null; });
@@ -157,7 +159,8 @@ function renderBasicLine(newData, root, line, showPoints) {
       .attr('cy', function (d) { return y(d.y); });
 
     circleBinding.merge(circleEntering)
-      .style('fill', lineColor)
+      .style('stroke', '#fff')
+      .style('fill', areaColor)
       .transition()
       .duration(transitionDuration)
       .attr('r', 3.5)
@@ -194,7 +197,7 @@ function renderRefLines(newData, root) {
 }
 
 function updateChart(newData) {
-  console.log('Main line using data', newData);
+  console.log('Main area using data', newData);
 
   x.domain(d3.extent(newData, function (d) { return d.x; }));
   y.domain(d3.extent(newData, function (d) { return d.y; }));
@@ -204,13 +207,13 @@ function updateChart(newData) {
 
   var filteredData = newData.filter(function (d) { return d.y != null; });
 
-  var gBasicLine = svg.select('.basic-line');
-  renderBasicLine(filteredData, gBasicLine, line, true);
-  var gBasicLineDefined = svg.select('.basic-line-defined');
-  renderBasicLine(newData, gBasicLineDefined, lineWithDefined);
+  var gBasicLine = svg.select('.basic-area');
+  renderBasicArea(filteredData, gBasicLine, area, true);
+  var gBasicLineDefined = svg.select('.basic-area-defined');
+  renderBasicArea(newData, gBasicLineDefined, areaWithDefined);
 
-  var gChunkedLine = svg.select('.chunked-line');
-  renderChunkedLine(newData, gChunkedLine);
+  var gChunkedLine = svg.select('.chunked-area');
+  renderChunkedArea(newData, gChunkedLine);
 }
 
 // create the chart

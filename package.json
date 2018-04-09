@@ -1,25 +1,28 @@
 {
-  "name": "d3-line-chunked",
-  "version": "1.4.1",
-  "description": "A d3 plugin that renders a line with potential gaps in the data by styling the gaps differently from the defined areas. Single points are rendered as circles. Transitions are supported.",
-  "author": "Peter Beshai <peter.beshai@gmail.com> (http://github.com/pbeshai)",
+  "name": "d3-area-chunked",
+  "version": "1.0.0",
+  "description": "A d3 plugin that renders an area with potential gaps in the data by styling the gaps differently from the defined areas. Single points are rendered as circles. Transitions are supported.",
+  "authors": [
+    "Peter Beshai <peter.beshai@gmail.com> (http://github.com/pbeshai)",
+    "Frank van Wijk <f.e.vanwijk@gmail.com> (http://github.com/fvanwijk)"
+  ],
   "keywords": [
     "d3",
     "d3-module",
     "plugin",
-    "d3-line-chunked",
-    "line",
+    "d3-area-chunked",
+    "area",
     "time series",
     "chart",
     "svg"
   ],
   "license": "BSD-3-Clause",
-  "main": "build/d3-line-chunked.js",
+  "main": "build/d3-area-chunked.js",
   "jsnext:main": "index",
-  "homepage": "https://github.com/pbeshai/d3-line-chunked",
+  "homepage": "https://github.com/fvanwijk/d3-area-chunked",
   "repository": {
     "type": "git",
-    "url": "https://github.com/pbeshai/d3-line-chunked.git"
+    "url": "https://github.com/fvanwijk/d3-area-chunked.git"
   },
   "scripts": {
     "build": "rm -rf build && mkdir build && rollup --config rollup.config.js",
@@ -27,8 +30,8 @@
     "lint": "eslint -c .eslintrc.js src",
     "pretest": "npm run build",
     "test": "tape 'test/**/*-test.js'",
-    "prepublish": "npm run lint && npm run test && uglifyjs build/d3-line-chunked.js -c -m -o build/d3-line-chunked.min.js",
-    "postpublish": "zip -j build/d3-line-chunked.zip -- LICENSE README.md build/d3-line-chunked.js build/d3-line-chunked.min.js"
+    "prepublish": "npm run lint && npm run test && uglifyjs build/d3-area-chunked.js -c -m -o build/d3-area-chunked.min.js",
+    "postpublish": "zip -j build/d3-area-chunked.zip -- LICENSE README.md build/d3-area-chunked.js build/d3-area-chunked.min.js"
   },
   "devDependencies": {
     "babel-eslint": "^6.1.2",

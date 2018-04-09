@@ -1,34 +1,32 @@
-import { extent } from 'd3-array';
+import { extent, max } from 'd3-array';
 import { select } from 'd3-selection';
-import { curveLinear, line as d3Line } from 'd3-shape';
+import { curveLinear, area as d3Area } from 'd3-shape';
 import { interpolatePath } from 'd3-interpolate-path'; // only needed if using transitions
 
 // used to generate IDs for clip paths
 let counter = 0;
 
 /**
- * Renders line with potential gaps in the data by styling the gaps differently
+ * Renders area with potential gaps in the data by styling the gaps differently
  * from the defined areas. Single points are rendered as circles. Transitions are
  * supported.
  */
 export default function () {
-  const defaultLineAttrs = {
-    fill: 'none',
-    stroke: '#222',
-    'stroke-width': 1.5,
-    'stroke-opacity': 1,
+  const defaultAreaAttrs = {
+    fill: '#222',
+    stroke: 'none',
+    'fill-opacity': 1,
   };
   const defaultGapAttrs = {
-    'stroke-dasharray': '2 2',
-    'stroke-opacity': 0.35,
+    'fill-opacity': 0.35,
   };
   const defaultPointAttrs = {
-    // read fill and r at render time in case the lineAttrs changed
-    // fill: defaultLineAttrs.stroke,
-    // r: defaultLineAttrs['stroke-width'],
+    // read fill and r at render time in case the areaAttrs changed
+    // fill: defaultAreaAttrs.fill,
+    // r: defaultAreaAttrs['stroke-width'],
   };
 
-  const lineChunkName = 'line';
+  const areaChunkName = 'area';
   const gapChunkName = 'gap';
 
   /**
@@ -37,9 +35,14 @@ export default function () {
   let x = d => d[0];
 
   /**
+   * How to get the base line of the area
+   */
+  let y0 = () => 0;
+
+  /**
    * How to access the y attribute of `d`
    */
-  let y = d => d[1];
+  let y1 = d => d[1];
 
   /**
    * Function to determine if there is data for a given point.
@@ -70,22 +73,22 @@ export default function () {
    *
    * @param {Any} d data point
    * @param {Any[]} data the full dataset
-   * @return {String} The id of the chunk. Defaults to "line"
+   * @return {String} The id of the chunk. Defaults to "area"
    */
-  let chunk = () => lineChunkName;
+  let chunk = () => areaChunkName;
 
   /**
-   * Decides what line the chunk should be in when given two defined points
+   * Decides what area the chunk should be in when given two defined points
    * in different chunks. Uses the order provided by the keys of chunkDefinition
-   * if not specified, with `line` and `gap` prepended to the list if not
+   * if not specified, with `area` and `gap` prepended to the list if not
    * in the chunkDefinition object.
    *
    * @param {String} chunkNameLeft The name of the chunk for the point on the left
    * @param {String} chunkNameRight The name of the chunk for the point on the right
    * @param {String[]} chunkNames the ordered list of chunk names from chunkDefinitions
-   * @return {String} The name of the chunk to assign the line segment between the two points to.
+   * @return {String} The name of the chunk to assign the area segment between the two points to.
    */
-  let chunkLineResolver = function defaultChunkLineResolver(chunkNameLeft, chunkNameRight, chunkNames) {
+  let chunkAreaResolver = function defaultChunkAreaResolver(chunkNameLeft, chunkNameRight, chunkNames) {
     const leftIndex = chunkNames.indexOf(chunkNameLeft);
     const rightIndex = chunkNames.indexOf(chunkNameRight);
 
@@ -109,32 +112,32 @@ export default function () {
   let chunkDefinitions = {};
 
   /**
-   * Passed through to d3.line().curve. Default value: d3.curveLinear.
+   * Passed through to d3.area().curve. Default value: d3.curveLinear.
    */
   let curve = curveLinear;
 
   /**
    * Object mapping style keys to style values to be applied to both
-   * defined and undefined lines. Uses syntax similar to d3-selection-multi.
+   * defined and undefined areas. Uses syntax similar to d3-selection-multi.
    */
-  let lineStyles = {};
+  let areaStyles = {};
 
   /**
    * Object mapping attr keys to attr values to be applied to both
-   * defined and undefined lines. Uses syntax similar to d3-selection-multi.
+   * defined and undefined areas. Uses syntax similar to d3-selection-multi.
    */
-  let lineAttrs = defaultLineAttrs;
+  let areaAttrs = defaultAreaAttrs;
 
   /**
    * Object mapping style keys to style values to be applied only to the
-   * undefined lines. It overrides values provided in lineStyles. Uses
+   * undefined areas. It overrides values provided in areaStyles. Uses
    * syntax similar to d3-selection-multi.
    */
   let gapStyles = {};
 
   /**
    * Object mapping attr keys to attr values to be applied only to the
-   * undefined lines. It overrides values provided in lineAttrs. Uses
+   * undefined areas. It overrides values provided in areaAttrs. Uses
    * syntax similar to d3-selection-multi.
    */
   let gapAttrs = defaultGapAttrs;
@@ -148,30 +151,30 @@ export default function () {
   /**
    * Object mapping attr keys to attr values to be applied to points.
    * Note that if fill is not defined in pointStyles or pointAttrs, it
-   * will be read from the stroke color on the line itself.
+   * will be read from the stroke color on the area itself.
    * Uses syntax similar to d3-selection-multi.
    */
   let pointAttrs = defaultPointAttrs;
 
   /**
    * Flag to set whether to transition on initial render or not. If true,
-   * the line starts out flat and transitions in its y value. If false,
+   * the area starts out flat and transitions in its y value. If false,
    * it just immediately renders.
    */
   let transitionInitial = true;
 
   /**
    * An array `[xMin, xMax]` specifying the minimum and maximum x pixel values
-   * (e.g., `xScale.range()`). If defined, the undefined line will extend to
+   * (e.g., `xScale.range()`). If defined, the undefined area will extend to
    * the the values provided, otherwise it will end at the last defined points.
    */
   let extendEnds;
 
   /**
-   * Function to determine how to access the line data array from the passed in data
+   * Function to determine how to access the area data array from the passed in data
    * Defaults to the identity data => data.
-   * @param {Any} data line dataset
-   * @return {Array} The array of data points for that given line
+   * @param {Any} data area dataset
+   * @return {Array} The array of data points for that given area
    */
   let accessData = data => data;
 
@@ -205,19 +208,19 @@ export default function () {
 
   /**
    * Helper to get the chunk names that are defined. Prepends
-   * line, gap to the start of the array unless useChunkDefOrder
+   * area, gap to the start of the array unless useChunkDefOrder
    * is specified. In this case, it only prepends if they are
    * not specified in the chunk definitions.
    */
   function getChunkNames(useChunkDefOrder) {
     const chunkDefNames = Object.keys(chunkDefinitions);
-    let prependLine = true;
+    let prependArea = true;
     let prependGap = true;
 
-    // if using chunk definition order, only prepend line/gap if they aren't in the
+    // if using chunk definition order, only prepend area/gap if they aren't in the
     // chunk definition.
     if (useChunkDefOrder) {
-      prependLine = !chunkDefNames.includes(lineChunkName);
+      prependArea = !chunkDefNames.includes(areaChunkName);
       prependGap = !chunkDefNames.includes(gapChunkName);
     }
 
@@ -225,8 +228,8 @@ export default function () {
       chunkDefNames.unshift(gapChunkName);
     }
 
-    if (prependLine) {
-      chunkDefNames.unshift(lineChunkName);
+    if (prependArea) {
+      chunkDefNames.unshift(areaChunkName);
     }
 
     // remove duplicates and return
@@ -236,10 +239,10 @@ export default function () {
   /**
    * Helper function to compute the contiguous segments of the data
    * @param {String} chunkName the chunk name to match. points not matching are removed.
-   *   if undefined, uses 'line'.
-   * @param {Array} definedSegments An array of segments (subarrays) of the defined line data (output from
+   *   if undefined, uses 'area'.
+   * @param {Array} definedSegments An array of segments (subarrays) of the defined area data (output from
    *   computeDefinedSegments)
-   * @return {Array} An array of segments (subarrays) of the chunk line data
+   * @return {Array} An array of segments (subarrays) of the chunk area data
    */
   function computeChunkedSegments(chunkName, definedSegments) {
     // helper to split a segment into sub-segments based on the chunk name
@@ -273,7 +276,7 @@ export default function () {
           let added = false;
           // doesn't match chunk name, but does it go in the segment? as the end?
           if (dPrev) {
-            const segmentChunkName = chunkLineResolver(chunk(dPrev), dChunkName, chunkNames);
+            const segmentChunkName = chunkAreaResolver(chunk(dPrev), dChunkName, chunkNames);
 
             // if it is supposed to be in this chunk, add it in
             if (segmentChunkName === chunkName) {
@@ -286,7 +289,7 @@ export default function () {
           // doesn't belong in previous, so does it belong in next?
           if (!added && dNext != null) {
             // check if this point belongs in the next chunk
-            const nextSegmentChunkName = chunkLineResolver(dChunkName, chunk(dNext), chunkNames);
+            const nextSegmentChunkName = chunkAreaResolver(dChunkName, chunk(dNext), chunkNames);
 
             // if it's supposed to be in the next chunk, create it
             if (nextSegmentChunkName === chunkName) {
@@ -326,16 +329,16 @@ export default function () {
 
   /**
    * Helper function to compute the contiguous segments of the data
-   * @param {Array} lineData the line data
+   * @param {Array} areaData the area data
    * @param {String} chunkName the chunk name to match. points not matching are removed.
-   *   if undefined, uses 'line'.
-   * @return {Array} An array of segments (subarrays) of the line data
+   *   if undefined, uses 'area'.
+   * @return {Array} An array of segments (subarrays) of the area data
    */
-  function computeDefinedSegments(lineData) {
+  function computeDefinedSegments(areaData) {
     let startNewSegment = true;
 
     // split into segments of continuous data
-    const segments = lineData.reduce((segments, d) => {
+    const segments = areaData.reduce((segments, d) => {
       // skip if this point has no data
       if (!defined(d)) {
         startNewSegment = true;
@@ -392,18 +395,18 @@ export default function () {
 
 
   /**
-   * For the selected line, evaluate the definitions objects. This is necessary since
-   * some of the style/attr values are functions that need to be evaluated per line.
+   * For the selected area, evaluate the definitions objects. This is necessary since
+   * some of the style/attr values are functions that need to be evaluated per area.
    *
    * In general, the definitions are added in this order:
    *
-   * 1. definition from lineStyle, lineAttrs, pointStyles, pointAttrs
-   * 2. if it is the gap line, add in gapStyles, gapAttrs
+   * 1. definition from areaStyle, areaAttrs, pointStyles, pointAttrs
+   * 2. if it is the gap area, add in gapStyles, gapAttrs
    * 3. definition from chunkDefinitions
    *
    * Returns an object matching the form of chunkDefinitions:
    * {
-   *   line: { styles, attrs, pointStyles, pointAttrs },
+   *   area: { styles, attrs, pointStyles, pointAttrs },
    *   gap: { styles, attrs }
    *   chunkName1: { styles, attrs, pointStyles, pointAttrs },
    *   ...
@@ -429,33 +432,33 @@ export default function () {
     // get the list of chunks to create evaluated definitions for
     const chunks = getChunkNames();
 
-    // for each chunk, evaluate the attrs and styles to use for lines and points
+    // for each chunk, evaluate the attrs and styles to use for areas and points
     chunks.forEach(chunkName => {
       const chunkDef = chunkDefinitions[chunkName] || {};
       const evaluatedChunk = {
         styles: Object.assign({},
-          evaluateAttrsOrStyles(lineStyles),
-          evaluateAttrsOrStyles((chunkDefinitions[lineChunkName] || {}).styles),
+          evaluateAttrsOrStyles(areaStyles),
+          evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).styles),
           chunkName === gapChunkName ? evaluateAttrsOrStyles(gapStyles) : undefined,
           evaluateAttrsOrStyles(chunkDef.styles)),
         attrs: Object.assign({},
-          evaluateAttrsOrStyles(lineAttrs),
-          evaluateAttrsOrStyles((chunkDefinitions[lineChunkName] || {}).attrs),
+          evaluateAttrsOrStyles(areaAttrs),
+          evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).attrs),
           chunkName === gapChunkName ? evaluateAttrsOrStyles(gapAttrs) : undefined,
           evaluateAttrsOrStyles(chunkDef.attrs)),
       };
 
-      // set point attrs. defaults read from this chunk's line settings.
+      // set point attrs. defaults read from this chunk's area settings.
       const basePointAttrs = {
-        fill: evaluatedChunk.attrs.stroke,
+        fill: evaluatedChunk.attrs.fill,
         r: evaluatedChunk.attrs['stroke-width'] == null ?
-          undefined :
+          2 :
           parseFloat(evaluatedChunk.attrs['stroke-width']) + 1,
       };
 
       evaluatedChunk.pointAttrs = Object.assign(basePointAttrs,
         evaluateAttrsOrStyles(pointAttrs),
-        evaluateAttrsOrStyles((chunkDefinitions[lineChunkName] || {}).pointAttrs),
+        evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).pointAttrs),
         evaluateAttrsOrStyles(chunkDef.pointAttrs));
 
       // ensure `r` is a number (helps to remove 'px' if provided)
@@ -463,14 +466,14 @@ export default function () {
         evaluatedChunk.pointAttrs.r = parseFloat(evaluatedChunk.pointAttrs.r);
       }
 
-      // set point styles. if no fill attr set, use the line style stroke. otherwise read from the attr.
+      // set point styles. if no fill attr set, use the area style stroke. otherwise read from the attr.
       const basePointStyles = (chunkDef.pointAttrs && chunkDef.pointAttrs.fill != null) ? {} : {
-        fill: evaluatedChunk.styles.stroke,
+        fill: evaluatedChunk.styles.fill,
       };
 
       evaluatedChunk.pointStyles = Object.assign(basePointStyles,
         evaluateAttrsOrStyles(pointStyles),
-        evaluateAttrsOrStyles((chunkDefinitions[lineChunkName] || {}).pointStyles),
+        evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).pointStyles),
         evaluateAttrsOrStyles(chunkDef.pointStyles));
 
       evaluated[chunkName] = evaluatedChunk;
@@ -507,21 +510,21 @@ export default function () {
     // ENTER
     const circlesEnter = circles.enter().append('circle');
 
-    // apply user-provided attrs, using attributes from current line if not provided
+    // apply user-provided attrs, using attributes from current area if not provided
     applyAttrsAndStyles(circlesEnter, evaluatedDefinition, true);
 
     circlesEnter
       .classed(className, true)
       .attr('r', 1e-6) // overrides provided `r value for now
       .attr('cx', d => x(d.data))
-      .attr('cy', d => y(d.data));
+      .attr('cy', d => y1(d.data));
 
 
     // handle with transition
     if ((!initialRender || (initialRender && transitionInitial)) && transition) {
       const enterDuration = transitionDuration * 0.15;
 
-      // delay sizing up the radius until after the line transition
+      // delay sizing up the radius until after the area transition
       circlesEnter
         .transition(context)
         .delay(transitionDelay + (transitionDuration - enterDuration))
@@ -538,7 +541,7 @@ export default function () {
     }
     circles.attr('r', evaluatedDefinition.pointAttrs.r)
       .attr('cx', d => x(d.data))
-      .attr('cy', d => y(d.data));
+      .attr('cy', d => y1(d.data));
   }
 
   function renderClipRects(initialRender, transition, context, root, segments,
@@ -546,11 +549,11 @@ export default function () {
     // TODO: issue with assigning IDs to clipPath elements. need to update how we select/create them
     // need reference to path element to set stroke-width property
     const clipPath = root.select(`#${clipPathId}`);
-    let gDebug = root.select('.d3-line-chunked-debug');
+    let gDebug = root.select('.d3-area-chunked-debug');
 
     // set up debug group
     if (debug && gDebug.empty()) {
-      gDebug = root.append('g').classed('d3-line-chunked-debug', true);
+      gDebug = root.append('g').classed('d3-area-chunked-debug', true);
     } else if (!debug && !gDebug.empty()) {
       gDebug.remove();
     }
@@ -707,8 +710,8 @@ export default function () {
   /**
    * Helper function to draw the actual path
    */
-  function renderPath(initialRender, transition, context, root, lineData,
-      evaluatedDefinition, line, initialLine, className, clipPathId) {
+  function renderPath(initialRender, transition, context, root, areaData,
+      evaluatedDefinition, area, initialArea, className, clipPathId) {
     let path = root.select(`.${className.split(' ')[0]}`);
 
     // initial render
@@ -723,7 +726,7 @@ export default function () {
 
     // handle animations for initial render
     if (initialRender) {
-      path.attr('d', initialLine(lineData));
+      path.attr('d', initialArea(areaData));
     }
 
     // apply user defined styles and attributes
@@ -740,11 +743,11 @@ export default function () {
       // use attrTween is available (in transition)
       path.attrTween('d', function dTween() {
         const previous = select(this).attr('d');
-        const current = line(lineData);
+        const current = area(areaData);
         return interpolatePath(previous, current);
       });
     } else {
-      path.attr('d', () => line(lineData));
+      path.attr('d', () => area(areaData));
     }
 
     // can't return path since it might have the transition
@@ -752,51 +755,59 @@ export default function () {
   }
 
   /**
-   * Helper to get the line functions to use to draw the lines. Possibly
-   * updates the line data to be in [x, y] format if extendEnds is true.
+   * Helper to get the area functions to use to draw the areas. Possibly
+   * updates the area data to be in [x, y] format if extendEnds is true.
    *
-   * @return {Object} { line, initialLine, lineData }
+   * @return {Object} { area, initialArea, areaData }
    */
-  function getLineFunctions(lineData, initialRender, yDomain) { // eslint-disable-line no-unused-vars
+  function getAreaFunctions(areaData, initialRender, yDomain) { // eslint-disable-line no-unused-vars
     const yMax = yDomain[1];
 
-    // main line function
-    let line = d3Line().x(x).y(y).curve(curve);
-    let initialLine;
+    // main area function
+    let area = d3Area()
+      .x(x)
+      .y0(y0)
+      .y1(y1)
+      .curve(curve);
+    let initialArea;
 
-    // if the user specifies to extend ends for the undefined line, add points to the line for them.
-    if (extendEnds && lineData.length) {
+    // if the user specifies to extend ends for the undefined area, add points to the area for them.
+    if (extendEnds && areaData.length) {
       // we have to process the data here since we don't know how to format an input object
       // we use the [x, y] format of a data point
-      const processedLineData = lineData.map(d => [x(d), y(d)]);
-      lineData = [
-        [extendEnds[0], processedLineData[0][1]],
-        ...processedLineData,
-        [extendEnds[1], processedLineData[processedLineData.length - 1][1]],
+      const processedAreaData = areaData.map(d => [x(d), y1(d)]);
+      areaData = [
+        [extendEnds[0], processedAreaData[0][1]],
+        ...processedAreaData,
+        [extendEnds[1], processedAreaData[processedAreaData.length - 1][1]],
       ];
 
-      // this line function works on the processed data (default .x and .y read the [x,y] format)
-      line = d3Line().curve(curve);
+      // this area function works on the processed data (default .x and .y read the [x,y] format)
+      area = d3Area().y0(() => yMax).curve(curve);
     }
 
     // handle animations for initial render
     if (initialRender) {
-      // have the line load in with a flat y value
-      initialLine = line;
+      // have the area load in with a flat y value
+      initialArea = area;
       if (transitionInitial) {
-        initialLine = d3Line().x(x).y(yMax).curve(curve);
+        initialArea = d3Area()
+          .x(x)
+          .y0(yMax)
+          .y1(yMax)
+          .curve(curve);
 
-        // if the user extends ends, we should use the line that works on that data
+        // if the user extends ends, we should use the area that works on that data
         if (extendEnds) {
-          initialLine = d3Line().y(yMax).curve(curve);
+          initialArea = d3Area().y0(yMax).y1(yMax).curve(curve);
         }
       }
     }
 
     return {
-      line,
-      initialLine: initialLine || line,
-      lineData,
+      area,
+      initialArea: initialArea || area,
+      areaData,
     };
   }
 
@@ -810,70 +821,72 @@ export default function () {
       defs = root.append('defs');
     }
 
-    // className = d3-line-chunked-clip-chunkName
-    const className = `d3-line-chunked-clip-${chunkName}`;
+    // className = d3-area-chunked-clip-chunkName
+    const className = `d3-area-chunked-clip-${chunkName}`;
     let clipPath = defs.select(`.${className}`);
 
     // initial render
     if (clipPath.empty()) {
       clipPath = defs.append('clipPath')
         .attr('class', className)
-        .attr('id', `d3-line-chunked-clip-${chunkName}-${counter++}`);
+        .attr('id', `d3-area-chunked-clip-${chunkName}-${counter++}`);
     }
 
     return clipPath.attr('id');
   }
 
   /**
-   * Render the lines: circles, paths, clip rects for the given (data, lineIndex)
+   * Render the areas: circles, paths, clip rects for the given (data, areaIndex)
    */
-  function renderLines(initialRender, transition, context, root, data, lineIndex) {
+  function renderAreas(initialRender, transition, context, root, data, areaIndex) {
     // use the accessor if provided (e.g. if the data is something like
     // `{ results: [[x,y], [[x,y], ...]}`)
-    const lineData = accessData(data);
+    const areaData = accessData(data);
 
-    // filter to only defined data to plot the lines
-    const filteredLineData = lineData.filter(defined);
+    // filter to only defined data to plot the areas
+    const filteredAreaData = areaData.filter(defined);
 
     // determine the extent of the y values
-    const yExtent = extent(filteredLineData.map(d => y(d)));
+    const yExtent = extent(filteredAreaData.map(d => y1(d)));
+
+    const yMax = max(filteredAreaData.map(d => y0(d)));
 
     // determine the extent of the x values to handle stroke-width adjustments on
-    // clipping rects. Do not use extendEnds here since it can clip the line ending
+    // clipping rects. Do not use extendEnds here since it can clip the area ending
     // in an unnatural way, it's better to just show the end.
-    const xExtent = extent(filteredLineData.map(d => x(d)));
+    const xExtent = extent(filteredAreaData.map(d => x(d)));
 
     // evaluate attrs and styles for the given dataset
     // pass in the raw data and index for computing attrs and styles if they are functinos
-    const evaluatedDefinitions = evaluateDefinitions(data, lineIndex);
+    const evaluatedDefinitions = evaluateDefinitions(data, areaIndex);
 
-    // update line functions and data depending on animation and render circumstances
-    const lineResults = getLineFunctions(filteredLineData, initialRender, yExtent);
+    // update area functions and data depending on animation and render circumstances
+    const areaResults = getAreaFunctions(filteredAreaData, initialRender, yExtent);
 
-    // lineData possibly updated if extendEnds is true since we normalize to [x, y] format
-    const { line, initialLine, lineData: modifiedLineData } = lineResults;
+    // areaData possibly updated if extendEnds is true since we normalize to [x, y] format
+    const { area, initialArea, areaData: modifiedAreaData } = areaResults;
 
-    // for each chunk type, render a line
+    // for each chunk type, render a area
     const chunkNames = getChunkNames();
 
-    const definedSegments = computeDefinedSegments(lineData);
+    const definedSegments = computeDefinedSegments(areaData);
 
-    // for each chunk, draw a line, circles and clip rect
+    // for each chunk, draw a area, circles and clip rect
     chunkNames.forEach(chunkName => {
       const clipPathId = initializeClipPath(chunkName, root);
 
-      let className = `d3-line-chunked-chunk-${chunkName}`;
-      if (chunkName === lineChunkName) {
-        className = `d3-line-chunked-defined ${className}`;
+      let className = `d3-area-chunked-chunk-${chunkName}`;
+      if (chunkName === areaChunkName) {
+        className = `d3-area-chunked-defined ${className}`;
       } else if (chunkName === gapChunkName) {
-        className = `d3-line-chunked-undefined ${className}`;
+        className = `d3-area-chunked-undefined ${className}`;
       }
 
       // get the eval defs for this chunk name
       const evaluatedDefinition = evaluatedDefinitions[chunkName];
 
-      const path = renderPath(initialRender, transition, context, root, modifiedLineData,
-        evaluatedDefinition, line, initialLine, className, clipPathId);
+      const path = renderPath(initialRender, transition, context, root, modifiedAreaData,
+        evaluatedDefinition, area, initialArea, className, clipPathId);
 
       if (chunkName !== gapChunkName) {
         // compute the segments and points for this chunk type
@@ -890,7 +903,7 @@ export default function () {
           evaluatedDefinition, circlesClassName);
 
         renderClipRects(initialRender, transition, context, root, segments, xExtent,
-          yExtent, evaluatedDefinition, path, clipPathId);
+          [yExtent[0], yMax], evaluatedDefinition, path, clipPathId);
       }
     });
 
@@ -899,7 +912,7 @@ export default function () {
   }
 
   // the main function that is returned
-  function lineChunked(context) {
+  function areaChunked(context) {
     if (!context) {
       return;
     }
@@ -914,11 +927,11 @@ export default function () {
       transition = true;
     }
 
-    selection.each(function each(data, lineIndex) {
+    selection.each(function each(data, areaIndex) {
       const root = select(this);
 
-      const initialRender = root.select('.d3-line-chunked-defined').empty();
-      renderLines(initialRender, transition, context, root, data, lineIndex);
+      const initialRender = root.select('.d3-area-chunked-defined').empty();
+      renderAreas(initialRender, transition, context, root, data, areaIndex);
     });
 
     // provide warning about wrong attr/defs
@@ -940,7 +953,7 @@ export default function () {
           set(asConstant(newValue));
         }
 
-        return lineChunked;
+        return areaChunked;
       }
 
       // otherwise ignore value/no value provided, so use getter
@@ -949,23 +962,31 @@ export default function () {
   }
 
   // define `x([x])`
-  lineChunked.x = getterSetter({
+  areaChunked.x = getterSetter({
     get: () => x,
     set: (newValue) => { x = newValue; },
     setType: 'function',
     asConstant: (newValue) => () => +newValue, // d3 v4 uses +, so we do too
   });
 
-  // define `y([y])`
-  lineChunked.y = getterSetter({
-    get: () => y,
-    set: (newValue) => { y = newValue; },
+  // define `y0([y])`
+  areaChunked.y0 = getterSetter({
+    get: () => y0,
+    set: (newValue) => { y0 = newValue; },
+    setType: 'function',
+    asConstant: (newValue) => () => +newValue,
+  });
+
+  // define `y1([y])`
+  areaChunked.y1 = getterSetter({
+    get: () => y1,
+    set: (newValue) => { y1 = newValue; },
     setType: 'function',
     asConstant: (newValue) => () => +newValue,
   });
 
   // define `defined([defined])`
-  lineChunked.defined = getterSetter({
+  areaChunked.defined = getterSetter({
     get: () => defined,
     set: (newValue) => { defined = newValue; },
     setType: 'function',
@@ -973,7 +994,7 @@ export default function () {
   });
 
   // define `isNext([isNext])`
-  lineChunked.isNext = getterSetter({
+  areaChunked.isNext = getterSetter({
     get: () => isNext,
     set: (newValue) => { isNext = newValue; },
     setType: 'function',
@@ -981,92 +1002,92 @@ export default function () {
   });
 
   // define `chunk([chunk])`
-  lineChunked.chunk = getterSetter({
+  areaChunked.chunk = getterSetter({
     get: () => chunk,
     set: (newValue) => { chunk = newValue; },
     setType: 'function',
     asConstant: (newValue) => () => newValue,
   });
 
-  // define `chunkLineResolver([chunkLineResolver])`
-  lineChunked.chunkLineResolver = getterSetter({
-    get: () => chunkLineResolver,
-    set: (newValue) => { chunkLineResolver = newValue; },
+  // define `chunkAreaResolver([chunkAreaResolver])`
+  areaChunked.chunkAreaResolver = getterSetter({
+    get: () => chunkAreaResolver,
+    set: (newValue) => { chunkAreaResolver = newValue; },
     setType: 'function',
   });
 
   // define `chunkDefinitions([chunkDefinitions])`
-  lineChunked.chunkDefinitions = getterSetter({
+  areaChunked.chunkDefinitions = getterSetter({
     get: () => chunkDefinitions,
     set: (newValue) => { chunkDefinitions = newValue; },
     setType: 'object',
   });
 
   // define `curve([curve])`
-  lineChunked.curve = getterSetter({
+  areaChunked.curve = getterSetter({
     get: () => curve,
     set: (newValue) => { curve = newValue; },
     setType: 'function',
   });
 
-  // define `lineStyles([lineStyles])`
-  lineChunked.lineStyles = getterSetter({
-    get: () => lineStyles,
-    set: (newValue) => { lineStyles = newValue; },
+  // define `areaStyles([areaStyles])`
+  areaChunked.areaStyles = getterSetter({
+    get: () => areaStyles,
+    set: (newValue) => { areaStyles = newValue; },
     setType: 'object',
   });
 
   // define `gapStyles([gapStyles])`
-  lineChunked.gapStyles = getterSetter({
+  areaChunked.gapStyles = getterSetter({
     get: () => gapStyles,
     set: (newValue) => { gapStyles = newValue; },
     setType: 'object',
   });
 
   // define `pointStyles([pointStyles])`
-  lineChunked.pointStyles = getterSetter({
+  areaChunked.pointStyles = getterSetter({
     get: () => pointStyles,
     set: (newValue) => { pointStyles = newValue; },
     setType: 'object',
   });
 
-  // define `lineAttrs([lineAttrs])`
-  lineChunked.lineAttrs = getterSetter({
-    get: () => lineAttrs,
-    set: (newValue) => { lineAttrs = newValue; },
+  // define `areaAttrs([areaAttrs])`
+  areaChunked.areaAttrs = getterSetter({
+    get: () => areaAttrs,
+    set: (newValue) => { areaAttrs = newValue; },
     setType: 'object',
   });
 
   // define `gapAttrs([gapAttrs])`
-  lineChunked.gapAttrs = getterSetter({
+  areaChunked.gapAttrs = getterSetter({
     get: () => gapAttrs,
     set: (newValue) => { gapAttrs = newValue; },
     setType: 'object',
   });
 
   // define `pointAttrs([pointAttrs])`
-  lineChunked.pointAttrs = getterSetter({
+  areaChunked.pointAttrs = getterSetter({
     get: () => pointAttrs,
     set: (newValue) => { pointAttrs = newValue; },
     setType: 'object',
   });
 
   // define `transitionInitial([transitionInitial])`
-  lineChunked.transitionInitial = getterSetter({
+  areaChunked.transitionInitial = getterSetter({
     get: () => transitionInitial,
     set: (newValue) => { transitionInitial = newValue; },
     setType: 'boolean',
   });
 
   // define `extendEnds([extendEnds])`
-  lineChunked.extendEnds = getterSetter({
+  areaChunked.extendEnds = getterSetter({
     get: () => extendEnds,
     set: (newValue) => { extendEnds = newValue; },
     setType: 'object', // should be an array
   });
 
   // define `accessData([accessData])`
-  lineChunked.accessData = getterSetter({
+  areaChunked.accessData = getterSetter({
     get: () => accessData,
     set: (newValue) => { accessData = newValue; },
     setType: 'function',
@@ -1075,12 +1096,12 @@ export default function () {
 
 
   // define `debug([debug])`
-  lineChunked.debug = getterSetter({
+  areaChunked.debug = getterSetter({
     get: () => debug,
     set: (newValue) => { debug = newValue; },
     setType: 'boolean',
   });
 
-  return lineChunked;
+  return areaChunked;
 }
 
