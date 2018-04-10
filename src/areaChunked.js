@@ -1,4 +1,4 @@
-import { extent, max } from 'd3-array';
+import { extent } from 'd3-array';
 import { select } from 'd3-selection';
 import { curveLinear, area as d3Area } from 'd3-shape';
 import { interpolatePath } from 'd3-interpolate-path'; // only needed if using transitions

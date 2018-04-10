@@ -1,6 +1,6 @@
 # d3-area-chunked
 
-**:warning: This is a fork of [pbeshai/d3-line-chunked](pbeshai/d3-line-chunked)**
+**This is a fork of [pbeshai/d3-line-chunked](https://github.com/pbeshai/d3-line-chunked)**
 
 [![npm version](https://badge.fury.io/js/d3-area-chunked.svg)](https://badge.fury.io/js/d3-area-chunked)
 
@@ -17,7 +17,7 @@ Demo: http://frankvanwijk.nl/datavis/d3-area-chunked/
 ```js
 var areaChunked = d3.areaChunked()
   .x(function (d) { return xScale(d.x); })
-  .y0(function (d) { return yScale.range()[0]; })
+  .y0(function (d) { return yScale(0); })
   .y1(function (d) { return yScale(d.y); })
   .curve(d3.curveLinear)
   .defined(function (d) { return d.y != null; })
@@ -38,7 +38,7 @@ d3.select('svg')
 ```js
 var areaChunked = d3.areaChunked()
   .x(function (d) { return xScale(d.x); })
-  .y0(function (d) { return yScale.range()[0]; })
+  .y0(function (d) { return yScale(0); })
   .y1(function (d) { return yScale(d.y); })
   .defined(function (d) { return d.y != null; })
   .areaStyles({
