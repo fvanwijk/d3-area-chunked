@@ -78,7 +78,7 @@ Run a web server in the example directory
 
 ```bash
 cd example
-php -S localhost:8000
+npx http-server
 ```
 
 Go to http://localhost:8000
