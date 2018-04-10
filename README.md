@@ -1,6 +1,6 @@
 # d3-area-chunked
 
-**:warning: :construction: This is a WIP fork of [pbeshai/d3-line-chunked](pbeshai/d3-line-chunked)**
+**:warning: This is a fork of [pbeshai/d3-line-chunked](pbeshai/d3-line-chunked)**
 
 [![npm version](https://badge.fury.io/js/d3-area-chunked.svg)](https://badge.fury.io/js/d3-area-chunked)
 
@@ -8,10 +8,9 @@ A d3 plugin that renders an area with potential gaps in the data by styling the 
 
 Blog: [Showing Missing Data in Line Charts](https://bocoup.com/weblog/showing-missing-data-in-line-charts)
 
-<!--Demo: http://frankvanwijk.nl/d3-area-chunked/-->
+Demo: http://frankvanwijk.nl/datavis/d3-area-chunked/
 
-<!-- TODO: create new GIF -->
-![d3-area-chunked-demo](https://cloud.githubusercontent.com/assets/793847/18075172/806683f4-6e40-11e6-96bc-e0250adf0529.gif)
+![d3-area-chunked-demo](https://raw.githubusercontent.com/fvanwijk/d3-area-chunked/master/example/d3-area-chunked.gif)
 
 ## Example Usage
 
