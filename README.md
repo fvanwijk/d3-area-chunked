@@ -10,7 +10,7 @@ Blog: [Showing Missing Data in Line Charts](https://bocoup.com/weblog/showing-mi
 
 Demo: http://frankvanwijk.nl/datavis/d3-area-chunked/
 
-![d3-area-chunked-demo](https://raw.githubusercontent.com/fvanwijk/d3-area-chunked/master/example/d3-area-chunked.gif)
+![d3-area-chunked-demo](https://raw.githubusercontent.com/fvanwijk/d3-area-chunked/dab429e77f0e30ac5dfd77c50861682cf5ae2e02/example/d3-area-chunked.gif)
 
 ## Example Usage
 

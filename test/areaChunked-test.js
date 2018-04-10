@@ -145,7 +145,7 @@ tape('areaChunked() with many data points', function (t) {
   t.equal(g.select(definedPointClass).size(), 0);
   const rects = g.selectAll('clipPath').selectAll('rect');
   t.equal(rects.size(), 1);
-  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '0', width: '2', y: '1', height: '-1' });
+  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '0', width: '2', y: '0', height: '2' });
 
   t.end();
 });
@@ -195,9 +195,9 @@ tape('areaChunked() with many data points and some undefined', function (t) {
 
   const rects = g.selectAll('clipPath').selectAll('rect');
   t.equal(rects.size(), 3);
-  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '0', width: '1', y: '1', height: '-1' });
-  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '1', height: '-1' });
-  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '1', y: '1', height: '-1' });
+  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '0', width: '1', y: '0', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '0', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '1', y: '0', height: '3' });
 
   t.end();
 });
@@ -352,9 +352,9 @@ tape('areaChunked() stroke width clipping adjustments', function (t) {
 
   const rects = g.selectAll('clipPath').selectAll('rect');
   t.equal(rects.size(), 3);
-  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '-2', width: '3', y: '-1', height: '3' });
-  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '-1', height: '3' });
-  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '3', y: '-1', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '-2', width: '3', y: '-2', height: '7' });
+  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '-2', height: '7' });
+  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '3', y: '-2', height: '7' });
 
   t.end();
 });
@@ -379,9 +379,9 @@ tape('areaChunked() when context is a transition', function (t) {
 
   const rects = g.selectAll('clipPath').selectAll('rect');
   t.equal(rects.size(), 3);
-  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '0', width: '1', y: '1', height: '-1' });
-  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '1', height: '-1' });
-  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '1', y: '1', height: '-1' });
+  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '0', width: '1', y: '0', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '0', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '1', y: '0', height: '3' });
 
   t.end();
 });
@@ -439,13 +439,13 @@ tape('areaChunked() with extendEnds set', function (t) {
   t.equal(undefPathPoints[1], 'L1,2');
 
   // should area to end point
-  t.equal(undefPathPoints[undefPathPoints.length - 1], 'L0,3Z');
+  t.equal(undefPathPoints[undefPathPoints.length - 1], 'L0,0Z');
 
   const rects = g.selectAll('clipPath').selectAll('rect');
   t.equal(rects.size(), 3);
-  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '1', width: '1', y: '1', height: '-1' });
-  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '1', height: '-1' });
-  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '1', y: '1', height: '-1' });
+  t.deepEqual(rectDimensions(rects.nodes()[0]), { x: '1', width: '1', y: '0', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[1]), { x: '4', width: '0', y: '0', height: '3' });
+  t.deepEqual(rectDimensions(rects.nodes()[2]), { x: '6', width: '1', y: '0', height: '3' });
 
   t.end();
 });

@@ -35,14 +35,14 @@ export default function () {
   let x = d => d[0];
 
   /**
-   * How to get the base line of the area
-   */
-  let y0 = () => 0;
-
-  /**
    * How to access the y attribute of `d`
    */
   let y1 = d => d[1];
+
+  /**
+   * How to get the base line of the area
+   */
+  let y0 = () => y1([0, 0]);
 
   /**
    * Function to determine if there is data for a given point.
@@ -761,8 +761,6 @@ export default function () {
    * @return {Object} { area, initialArea, areaData }
    */
   function getAreaFunctions(areaData, initialRender, yDomain) { // eslint-disable-line no-unused-vars
-    const yMax = yDomain[1];
-
     // main area function
     let area = d3Area()
       .x(x)
@@ -783,7 +781,7 @@ export default function () {
       ];
 
       // this area function works on the processed data (default .x and .y read the [x,y] format)
-      area = d3Area().y0(() => yMax).curve(curve);
+      area = d3Area().y0(y0).curve(curve);
     }
 
     // handle animations for initial render
@@ -793,13 +791,13 @@ export default function () {
       if (transitionInitial) {
         initialArea = d3Area()
           .x(x)
-          .y0(yMax)
-          .y1(yMax)
+          .y0(y0)
+          .y1(y0)
           .curve(curve);
 
         // if the user extends ends, we should use the area that works on that data
         if (extendEnds) {
-          initialArea = d3Area().y0(yMax).y1(yMax).curve(curve);
+          initialArea = d3Area().y0(y0).y1(y0).curve(curve);
         }
       }
     }
@@ -848,8 +846,6 @@ export default function () {
 
     // determine the extent of the y values
     const yExtent = extent(filteredAreaData.map(d => y1(d)));
-
-    const yMax = max(filteredAreaData.map(d => y0(d)));
 
     // determine the extent of the x values to handle stroke-width adjustments on
     // clipping rects. Do not use extendEnds here since it can clip the area ending
@@ -903,7 +899,7 @@ export default function () {
           evaluatedDefinition, circlesClassName);
 
         renderClipRects(initialRender, transition, context, root, segments, xExtent,
-          [yExtent[0], yMax], evaluatedDefinition, path, clipPathId);
+          [Math.min(yExtent[0], y0()), Math.max(yExtent[1], y0())], evaluatedDefinition, path, clipPathId);
       }
     });
 

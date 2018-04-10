@@ -30,3 +30,13 @@ body {
 .example h3 {
   margin-top: 0;
 }
+
+.axis .tick text {
+  fill: lightgrey;
+}
+.axis .tick line {
+  stroke: grey;
+}
+.axis .domain {
+  display: none;
+}

@@ -207,17 +207,17 @@ function areaChunked () {
   };
 
   /**
-   * How to get the base line of the area
-   */
-  var y0 = function y0() {
-    return 0;
-  };
-
-  /**
    * How to access the y attribute of `d`
    */
   var y1 = function y1(d) {
     return d[1];
+  };
+
+  /**
+   * How to get the base line of the area
+   */
+  var y0 = function y0() {
+    return y1([0, 0]);
   };
 
   /**
@@ -936,8 +936,6 @@ function areaChunked () {
    */
   function getAreaFunctions(areaData, initialRender, yDomain) {
     // eslint-disable-line no-unused-vars
-    var yMax = yDomain[1];
-
     // main area function
     var area = d3Shape.area().x(x).y0(y0).y1(y1).curve(curve);
     var initialArea = void 0;
@@ -952,9 +950,7 @@ function areaChunked () {
       areaData = [[extendEnds[0], processedAreaData[0][1]]].concat(toConsumableArray(processedAreaData), [[extendEnds[1], processedAreaData[processedAreaData.length - 1][1]]]);
 
       // this area function works on the processed data (default .x and .y read the [x,y] format)
-      area = d3Shape.area().y0(function () {
-        return yMax;
-      }).curve(curve);
+      area = d3Shape.area().y0(y0).curve(curve);
     }
 
     // handle animations for initial render
@@ -962,11 +958,11 @@ function areaChunked () {
       // have the area load in with a flat y value
       initialArea = area;
       if (transitionInitial) {
-        initialArea = d3Shape.area().x(x).y0(yMax).y1(yMax).curve(curve);
+        initialArea = d3Shape.area().x(x).y0(y0).y1(y0).curve(curve);
 
         // if the user extends ends, we should use the area that works on that data
         if (extendEnds) {
-          initialArea = d3Shape.area().y0(yMax).y1(yMax).curve(curve);
+          initialArea = d3Shape.area().y0(y0).y1(y0).curve(curve);
         }
       }
     }
@@ -1014,10 +1010,6 @@ function areaChunked () {
     // determine the extent of the y values
     var yExtent = d3Array.extent(filteredAreaData.map(function (d) {
       return y1(d);
-    }));
-
-    var yMax = d3Array.max(filteredAreaData.map(function (d) {
-      return y0(d);
     }));
 
     // determine the extent of the x values to handle stroke-width adjustments on
@@ -1079,7 +1071,7 @@ function areaChunked () {
         }).join(' ');
         renderCircles(initialRender, transition, context, root, points, evaluatedDefinition, circlesClassName);
 
-        renderClipRects(initialRender, transition, context, root, segments, xExtent, [yExtent[0], yMax], evaluatedDefinition, path, clipPathId);
+        renderClipRects(initialRender, transition, context, root, segments, xExtent, [Math.min(yExtent[0], y0()), Math.max(yExtent[1], y0())], evaluatedDefinition, path, clipPathId);
       }
     });
 

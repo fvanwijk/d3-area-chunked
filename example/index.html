@@ -27,7 +27,7 @@ var areaColor = '#0bb';
 /* eslint-disable */
 function generateRandom(length) {
   var xRandomizer = d3.randomNormal(150, 150);
-  var yRandomizer = d3.randomLogNormal(3, 1.2);
+  var yRandomizer = d3.randomNormal(-10, 10);
   var vRandomizer = d3.randomNormal(150, 50);
   var missingChance = 0.8;
 
@@ -46,7 +46,7 @@ function generateRandom(length) {
 }
 
 function setupChart(data) {
-  var margin = {top: 20, right: 30, bottom: 0, left: 20};
+  var margin = {top: 20, right: 30, bottom: 0, left: 55};
   width = 800 - margin.left - margin.right;
   height = 450 - margin.top - margin.bottom;
   var numGroups = 3;
@@ -61,6 +61,8 @@ function setupChart(data) {
       .scaleLinear()
       .domain(d3.extent(data, function (d) { return d.y; }))
       .range([0.5 * groupHeight, 0]);
+
+  yAxis = d3.axisLeft(y).ticks(5);
 
   svg = d3.select('.chart-container').append('svg')
       .attr('width', width + margin.left + margin.right)
@@ -84,26 +86,35 @@ function setupChart(data) {
   svg.append('g')
       .attr('class', 'ref-lines');
 
-  svg.append('g')
-      .attr('class', 'basic-area')
-      .append('text')
-        .text('d3.area')
-        .attr('dy', -8);
+  const basicArea = svg.append('g')
+      .attr('class', 'basic-area');
+  basicArea.append('text')
+      .text('d3.area')
+      .attr('dy', -8);
+  basicArea.append('g')
+      .attr('class', 'axis')
+      .attr('transform', 'translate(-5, 0)');
 
-  svg.append('g')
+  const gBasicAreaDefined = svg.append('g')
       .attr('class', 'basic-area-defined')
-      .attr('transform', 'translate(0 ' + (groupHeight) + ')')
-      .append('text')
-        .text('d3.area with defined()')
-        .attr('dy', -8);
+      .attr('transform', 'translate(0 ' + (groupHeight) + ')');
+  gBasicAreaDefined.append('text')
+      .text('d3.area with defined()')
+      .attr('dy', -8);
+  gBasicAreaDefined.append('g')
+      .attr('class', 'axis')
+      .attr('transform', 'translate(-5, 0)');
 
-  svg.append('g')
+  const chunkedArea = svg.append('g')
     .attr('class', 'chunked-area')
-    .attr('transform', 'translate(0 ' + (2 * groupHeight) + ')')
-    .append('text')
-        .text('d3-area-chunked')
-        .style('font-weight', 'bold')
-        .attr('dy', -8);
+    .attr('transform', 'translate(0 ' + (2 * groupHeight) + ')');
+  chunkedArea.append('text')
+      .text('d3-area-chunked')
+      .style('font-weight', 'bold')
+      .attr('dy', -8);
+  chunkedArea.append('g')
+    .attr('class', 'axis')
+    .attr('transform', 'translate(-5, 0)');
 
   d3.select('.chart-container').append('button')
     .text('New Data')
@@ -132,16 +143,15 @@ function renderChunkedArea(lineData, root) {
 
 function renderBasicArea(newData, root, area, showPoints) {
   // render basic area
-  var basicArea = root.select('path');
+  var basicArea = root.select('.area');
 
   if (basicArea.empty()) {
-    basicArea = root.append('path')
+    basicArea = root.append('path').attr('class', 'area')
       .style('opacity', 1e-6);
   }
 
   basicArea
       .style('fill', areaColor)
-      //.style('stroke', '#ccc') // debug
       .style('stroke-width', 2)
       .transition()
       .duration(transitionDuration)
@@ -207,13 +217,17 @@ function updateChart(newData) {
 
   var filteredData = newData.filter(function (d) { return d.y != null; });
 
-  var gBasicLine = svg.select('.basic-area');
-  renderBasicArea(filteredData, gBasicLine, area, true);
-  var gBasicLineDefined = svg.select('.basic-area-defined');
-  renderBasicArea(newData, gBasicLineDefined, areaWithDefined);
+  var gBasicArea = svg.select('.basic-area');
+  renderBasicArea(filteredData, gBasicArea, area, true);
+  var gBasicAreaDefined = svg.select('.basic-area-defined');
+  renderBasicArea(newData, gBasicAreaDefined, areaWithDefined);
 
-  var gChunkedLine = svg.select('.chunked-area');
-  renderChunkedArea(newData, gChunkedLine);
+  var gChunkedArea = svg.select('.chunked-area');
+  renderChunkedArea(newData, gChunkedArea);
+
+  gBasicArea.select('.axis').transition().duration(transitionDuration).call(yAxis);
+  gBasicAreaDefined.select('.axis').transition().duration(transitionDuration).call(yAxis);
+  gChunkedArea.select('.axis').transition().duration(transitionDuration).call(yAxis);
 }
 
 // create the chart

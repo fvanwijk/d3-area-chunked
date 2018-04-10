@@ -23,7 +23,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -43,7 +43,7 @@
         var chunked = d3.areaChunked()
           .curve(d3.curveMonotoneX)
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -62,7 +62,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -82,7 +82,7 @@
         var chunked = d3.areaChunked()
           .areaStyles({ 'stroke-width': '10px' })
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -101,7 +101,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .extendEnds(x.range());
@@ -121,7 +121,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .areaStyles({ 'stroke-width': 4 });
@@ -141,7 +141,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -160,7 +160,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -179,7 +179,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -198,7 +198,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -217,7 +217,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .accessData(data => data.results);
@@ -237,7 +237,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .chunkDefinitions({
@@ -278,7 +278,7 @@
 
         const chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .chunkDefinitions({
@@ -310,7 +310,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
@@ -332,7 +332,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
@@ -358,7 +358,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
@@ -384,7 +384,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .extendEnds(x.range())
@@ -411,7 +411,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
@@ -437,7 +437,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .isNext(function (prev, curr) { return curr[0] === prev[0] + 1; })
           .debug(transitionDebug)
@@ -473,7 +473,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d.x); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d.y); })
           .defined(function (d) { return d.y != null; })
           .debug(transitionDebug)
@@ -511,7 +511,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d.x); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d.y); })
           .defined(function (d) { return d.y != null; })
           .debug(transitionDebug)
@@ -558,7 +558,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; });
 
@@ -578,7 +578,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .debug(transitionDebug)
@@ -604,7 +604,7 @@
 
         var chunked = d3.areaChunked()
           .x(function (d) { return x(d[0]); })
-          .y0(function (d) { return y.range()[0]; })
+          .y0(function () { return y(0); })
           .y1(function (d) { return y(d[1]); })
           .defined(function (d) { return d[1] !== null; })
           .isNext(function (prev, curr) { return curr[0] === prev[0] + 1; })
