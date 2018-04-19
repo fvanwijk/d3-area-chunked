@@ -185,6 +185,7 @@ function areaChunked () {
   var defaultAreaAttrs = {
     fill: '#222',
     stroke: 'none',
+    'stroke-width': 0,
     'fill-opacity': 1
   };
   var defaultGapAttrs = {
