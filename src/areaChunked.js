@@ -11,7 +11,7 @@ let counter = 0;
  * from the defined areas. Single points are rendered as circles. Transitions are
  * supported.
  */
-export default function () {
+export default function render() {
   const defaultAreaAttrs = {
     fill: '#222',
     stroke: 'none',
@@ -33,12 +33,12 @@ export default function () {
   /**
    * How to access the x attribute of `d`
    */
-  let x = d => d[0];
+  let x = (d) => d[0];
 
   /**
    * How to access the y attribute of `d`
    */
-  let y1 = d => d[1];
+  let y1 = (d) => d[1];
 
   /**
    * How to get the base line of the area
@@ -177,20 +177,19 @@ export default function () {
    * @param {Any} data area dataset
    * @return {Array} The array of data points for that given area
    */
-  let accessData = data => data;
+  let accessData = (data) => data;
 
   /**
    * A flag specifying whether to render in debug mode or not.
    */
   let debug = false;
 
-
   /**
    * Logs warnings if the chunk definitions uses 'style' or 'attr' instead of
    * 'styles' or 'attrs'
    */
   function validateChunkDefinitions() {
-    Object.keys(chunkDefinitions).forEach(key => {
+    Object.keys(chunkDefinitions).forEach((key) => {
       const def = chunkDefinitions[key];
       if (def.style != null) {
         console.warn(`Warning: chunkDefinitions expects "styles", but found "style" in ${key}`, def);
@@ -307,7 +306,6 @@ export default function () {
           }
         }
 
-
         return segments;
       }, []);
 
@@ -394,7 +392,6 @@ export default function () {
     });
   }
 
-
   /**
    * For the selected area, evaluate the definitions objects. This is necessary since
    * some of the style/attr values are functions that need to be evaluated per area.
@@ -434,27 +431,29 @@ export default function () {
     const chunks = getChunkNames();
 
     // for each chunk, evaluate the attrs and styles to use for areas and points
-    chunks.forEach(chunkName => {
+    chunks.forEach((chunkName) => {
       const chunkDef = chunkDefinitions[chunkName] || {};
       const evaluatedChunk = {
-        styles: Object.assign({},
-          evaluateAttrsOrStyles(areaStyles),
-          evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).styles),
-          chunkName === gapChunkName ? evaluateAttrsOrStyles(gapStyles) : undefined,
-          evaluateAttrsOrStyles(chunkDef.styles)),
-        attrs: Object.assign({},
-          evaluateAttrsOrStyles(areaAttrs),
-          evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).attrs),
-          chunkName === gapChunkName ? evaluateAttrsOrStyles(gapAttrs) : undefined,
-          evaluateAttrsOrStyles(chunkDef.attrs)),
+        styles: {
+          ...evaluateAttrsOrStyles(areaStyles),
+          ...evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).styles),
+          ...(chunkName === gapChunkName ? evaluateAttrsOrStyles(gapStyles) : undefined),
+          ...evaluateAttrsOrStyles(chunkDef.styles),
+        },
+        attrs: {
+          ...evaluateAttrsOrStyles(areaAttrs),
+          ...evaluateAttrsOrStyles((chunkDefinitions[areaChunkName] || {}).attrs),
+          ...(chunkName === gapChunkName ? evaluateAttrsOrStyles(gapAttrs) : undefined),
+          ...evaluateAttrsOrStyles(chunkDef.attrs),
+        },
       };
 
       // set point attrs. defaults read from this chunk's area settings.
       const basePointAttrs = {
         fill: evaluatedChunk.attrs.fill,
-        r: evaluatedChunk.attrs['stroke-width'] == null ?
-          2 :
-          parseFloat(evaluatedChunk.attrs['stroke-width']) + 1,
+        r: evaluatedChunk.attrs['stroke-width'] == null
+          ? 2
+          : parseFloat(evaluatedChunk.attrs['stroke-width']) + 1,
       };
 
       evaluatedChunk.pointAttrs = Object.assign(basePointAttrs,
@@ -483,14 +482,13 @@ export default function () {
     return evaluated;
   }
 
-
   /**
    * Render the points for when segments have length 1.
    */
   function renderCircles(initialRender, transition, context, root, points, evaluatedDefinition,
-      className) {
+    className) {
     const primaryClassName = className.split(' ')[0];
-    let circles = root.selectAll(`.${primaryClassName}`).data(points, d => d.id);
+    let circles = root.selectAll(`.${primaryClassName}`).data(points, (d) => d.id);
 
     // read in properties about the transition if we have one
     const transitionDuration = transition ? context.duration() : 0;
@@ -517,9 +515,8 @@ export default function () {
     circlesEnter
       .classed(className, true)
       .attr('r', 1e-6) // overrides provided `r value for now
-      .attr('cx', d => x(d.data))
-      .attr('cy', d => y1(d.data));
-
+      .attr('cx', (d) => x(d.data))
+      .attr('cy', (d) => y1(d.data));
 
     // handle with transition
     if ((!initialRender || (initialRender && transitionInitial)) && transition) {
@@ -535,18 +532,17 @@ export default function () {
       circlesEnter.attr('r', evaluatedDefinition.pointAttrs.r);
     }
 
-
     // UPDATE
     if (transition) {
       circles = circles.transition(context);
     }
     circles.attr('r', evaluatedDefinition.pointAttrs.r)
-      .attr('cx', d => x(d.data))
-      .attr('cy', d => y1(d.data));
+      .attr('cx', (d) => x(d.data))
+      .attr('cy', (d) => y1(d.data));
   }
 
   function renderClipRects(initialRender, transition, context, root, segments,
-      [xMin, xMax], [yMin, yMax], evaluatedDefinition, path, clipPathId) {
+    [xMin, xMax], [yMin, yMax], evaluatedDefinition, path, clipPathId) {
     // TODO: issue with assigning IDs to clipPath elements. need to update how we select/create them
     // need reference to path element to set stroke-width property
     const clipPath = root.select(`#${clipPathId}`);
@@ -585,7 +581,7 @@ export default function () {
       if (!previousRects.length) {
         visibleArea = [[xMin, xMax]];
       } else {
-        visibleArea = previousRects.map(rect => {
+        visibleArea = previousRects.map((rect) => {
           const selectedRect = select(rect);
           const xStart = parseFloat(selectedRect.attr('x'));
           const xEnd = parseFloat(selectedRect.attr('width')) + xStart;
@@ -599,7 +595,7 @@ export default function () {
       if (!segments.length) {
         nextVisibleArea = [[0, 0]];
       } else {
-        nextVisibleArea = segments.map(d => {
+        nextVisibleArea = segments.map((d) => {
           const xStart = x(d[0]);
           const xEnd = x(d[d.length - 1]);
           return [xStart, xEnd];
@@ -612,7 +608,7 @@ export default function () {
         const xStart = x(d[0]);
         const xEnd = x(d[d.length - 1]);
         const xMid = xStart + ((xEnd - xStart) / 2);
-        const visArea = visibleArea.find(area => area[0] <= xMid && xMid <= area[1]);
+        const visArea = visibleArea.find((area) => area[0] <= xMid && xMid <= area[1]);
 
         // set width to overlapping visible area
         if (visArea) {
@@ -625,8 +621,8 @@ export default function () {
 
       function exitRect(rect) { // eslint-disable-line no-inner-declarations
         rect
-          .attr('x', d => visibleStartEnd(d, nextVisibleArea)[0])
-          .attr('width', d => {
+          .attr('x', (d) => visibleStartEnd(d, nextVisibleArea)[0])
+          .attr('width', (d) => {
             const [xStart, xEnd] = visibleStartEnd(d, nextVisibleArea);
             return xEnd - xStart;
           });
@@ -634,8 +630,8 @@ export default function () {
 
       function enterRect(rect) { // eslint-disable-line no-inner-declarations
         rect
-          .attr('x', d => visibleStartEnd(d, visibleArea)[0])
-          .attr('width', d => {
+          .attr('x', (d) => visibleStartEnd(d, visibleArea)[0])
+          .attr('width', (d) => {
             const [xStart, xEnd] = visibleStartEnd(d, visibleArea);
             return xEnd - xStart;
           })
@@ -677,7 +673,7 @@ export default function () {
 
     // after transition, update the clip rect dimensions
     function updateRect(rect) {
-      rect.attr('x', d => {
+      rect.attr('x', (d) => {
         // if at the edge, adjust for stroke width
         const val = x(d[0]);
         if (val === xMin) {
@@ -685,21 +681,21 @@ export default function () {
         }
         return val;
       })
-      .attr('width', d => {
+        .attr('width', (d) => {
         // if at the edge, adjust for stroke width to prevent clipping it
-        let valMin = x(d[0]);
-        let valMax = x(d[d.length - 1]);
-        if (valMin === xMin) {
-          valMin -= strokeWidthClipAdjustment;
-        }
-        if (valMax === xMax) {
-          valMax += strokeWidthClipAdjustment;
-        }
+          let valMin = x(d[0]);
+          let valMax = x(d[d.length - 1]);
+          if (valMin === xMin) {
+            valMin -= strokeWidthClipAdjustment;
+          }
+          if (valMax === xMax) {
+            valMax += strokeWidthClipAdjustment;
+          }
 
-        return valMax - valMin;
-      })
-      .attr('y', clipRectY)
-      .attr('height', clipRectHeight);
+          return valMax - valMin;
+        })
+        .attr('y', clipRectY)
+        .attr('height', clipRectHeight);
     }
 
     clipPathRects.call(updateRect);
@@ -712,7 +708,7 @@ export default function () {
    * Helper function to draw the actual path
    */
   function renderPath(initialRender, transition, context, root, areaData,
-      evaluatedDefinition, area, initialArea, className, clipPathId) {
+    evaluatedDefinition, area, initialArea, className, clipPathId) {
     let path = root.select(`.${className.split(' ')[0]}`);
 
     // initial render
@@ -774,7 +770,7 @@ export default function () {
     if (extendEnds && areaData.length) {
       // we have to process the data here since we don't know how to format an input object
       // we use the [x, y] format of a data point
-      const processedAreaData = areaData.map(d => [x(d), y1(d)]);
+      const processedAreaData = areaData.map((d) => [x(d), y1(d)]);
       areaData = [
         [extendEnds[0], processedAreaData[0][1]],
         ...processedAreaData,
@@ -826,9 +822,10 @@ export default function () {
 
     // initial render
     if (clipPath.empty()) {
+      counter += 1;
       clipPath = defs.append('clipPath')
         .attr('class', className)
-        .attr('id', `d3-area-chunked-clip-${chunkName}-${counter++}`);
+        .attr('id', `d3-area-chunked-clip-${chunkName}-${counter}`);
     }
 
     return clipPath.attr('id');
@@ -846,12 +843,12 @@ export default function () {
     const filteredAreaData = areaData.filter(defined);
 
     // determine the extent of the y values
-    const yExtent = extent(filteredAreaData.map(d => y1(d)));
+    const yExtent = extent(filteredAreaData.map((d) => y1(d)));
 
     // determine the extent of the x values to handle stroke-width adjustments on
     // clipping rects. Do not use extendEnds here since it can clip the area ending
     // in an unnatural way, it's better to just show the end.
-    const xExtent = extent(filteredAreaData.map(d => x(d)));
+    const xExtent = extent(filteredAreaData.map((d) => x(d)));
 
     // evaluate attrs and styles for the given dataset
     // pass in the raw data and index for computing attrs and styles if they are functinos
@@ -869,7 +866,7 @@ export default function () {
     const definedSegments = computeDefinedSegments(areaData);
 
     // for each chunk, draw a area, circles and clip rect
-    chunkNames.forEach(chunkName => {
+    chunkNames.forEach((chunkName) => {
       const clipPathId = initializeClipPath(chunkName, root);
 
       let className = `d3-area-chunked-chunk-${chunkName}`;
@@ -888,14 +885,14 @@ export default function () {
       if (chunkName !== gapChunkName) {
         // compute the segments and points for this chunk type
         const segments = computeChunkedSegments(chunkName, definedSegments);
-        const points = segments.filter(segment => segment.length === 1)
-          .map(segment => ({
+        const points = segments.filter((segment) => segment.length === 1)
+          .map((segment) => ({
             // use random ID so they are treated as entering/exiting each time
             id: x(segment[0]),
             data: segment[0],
           }));
 
-        const circlesClassName = className.split(' ').map(name => `${name}-point`).join(' ');
+        const circlesClassName = className.split(' ').map((name) => `${name}-point`).join(' ');
         renderCircles(initialRender, transition, context, root, points,
           evaluatedDefinition, circlesClassName);
 
@@ -938,10 +935,13 @@ export default function () {
   // ------------------------------------------------
   // Define getters and setters
   // ------------------------------------------------
-  function getterSetter({ get, set, setType, asConstant }) {
+  function getterSetter({
+    get, set, setType, asConstant,
+  }) {
     return function getSet(newValue) {
       if (arguments.length) {
         // main setter if setType matches newValue type
+        // eslint-disable-next-line valid-typeof
         if ((!setType && newValue != null) || (setType && typeof newValue === setType)) {
           set(newValue);
 
@@ -1088,9 +1088,8 @@ export default function () {
     get: () => accessData,
     set: (newValue) => { accessData = newValue; },
     setType: 'function',
-    asConstant: (newValue) => d => d[newValue],
+    asConstant: (newValue) => (d) => d[newValue],
   });
-
 
   // define `debug([debug])`
   areaChunked.debug = getterSetter({
@@ -1101,4 +1100,3 @@ export default function () {
 
   return areaChunked;
 }
-

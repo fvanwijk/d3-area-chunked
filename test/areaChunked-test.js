@@ -9,6 +9,12 @@ const definedAreaClass = '.d3-area-chunked-defined';
 const undefinedAreaClass = '.d3-area-chunked-undefined';
 const definedPointClass = '.d3-area-chunked-defined-point';
 
+function getDocument() {
+  const { JSDOM } = jsdom;  
+  const { document } = (new JSDOM('<!doctype html><html><body></body></html>')).window;  
+  return document;
+}
+
 function lengthOfPath(path) {
   if (!path || path.empty()) {
     return null;
@@ -75,7 +81,7 @@ tape('areaChunked() getter and setters work', function (t) {
 */
 
 tape('areaChunked() with empty data', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked();
@@ -94,7 +100,7 @@ tape('areaChunked() with empty data', function (t) {
 
 
 tape('areaChunked() with one data point', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked();
@@ -112,7 +118,8 @@ tape('areaChunked() with one data point', function (t) {
 });
 
 tape('areaChunked() with null transition to null', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
+
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked().defined(d => d[1] != null);
@@ -131,7 +138,7 @@ tape('areaChunked() with null transition to null', function (t) {
 
 
 tape('areaChunked() with many data points', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked().areaAttrs({ 'stroke-width': 0 });
@@ -152,7 +159,7 @@ tape('areaChunked() with many data points', function (t) {
 
 // this test is important to make sure we don't keep adding in new paths
 tape('areaChunked() updates existing path', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked().areaAttrs({ 'stroke-width': 0 });
@@ -177,7 +184,7 @@ tape('areaChunked() updates existing path', function (t) {
 });
 
 tape('areaChunked() with many data points and some undefined', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -204,7 +211,7 @@ tape('areaChunked() with many data points and some undefined', function (t) {
 
 
 tape('areaChunked() sets attrs and styles', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -260,7 +267,7 @@ tape('areaChunked() sets attrs and styles', function (t) {
 });
 
 tape('areaChunked() sets attrs and styles via chunkDefinitions', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -334,7 +341,7 @@ tape('areaChunked() sets attrs and styles via chunkDefinitions', function (t) {
 
 
 tape('areaChunked() stroke width clipping adjustments', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -361,7 +368,7 @@ tape('areaChunked() stroke width clipping adjustments', function (t) {
 
 
 tape('areaChunked() when context is a transition', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -388,7 +395,7 @@ tape('areaChunked() when context is a transition', function (t) {
 
 
 tape('areaChunked() - defined and isNext can set gaps in data', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const gDefined = select(document.body).append('svg').append('g');
 
   const chunkedDefined = areaChunked()
@@ -416,7 +423,7 @@ tape('areaChunked() - defined and isNext can set gaps in data', function (t) {
 });
 
 tape('areaChunked() with extendEnds set', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -451,7 +458,7 @@ tape('areaChunked() with extendEnds set', function (t) {
 });
 
 tape('areaChunked() resolves chunk areas correctly', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
@@ -502,7 +509,7 @@ tape('areaChunked() resolves chunk areas correctly', function (t) {
 });
 
 tape('areaChunked() puts circles above paths when using multiple chunks', function (t) {
-  const document = jsdom.jsdom();
+  const document = getDocument();
   const g = select(document.body).append('svg').append('g');
 
   const chunked = areaChunked()
