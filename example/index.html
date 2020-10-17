@@ -1,240 +1,246 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>d3-area-chunked</title>
-    <meta charset="utf-8">
-    <link rel="stylesheet" href="example.css" />
-  </head>
-  <body>
-    <h1 class="main-header">d3-area-chunked</h1>
-    <p class="main-link"><a href="https://github.com/fvanwijk/d3-area-chunked">https://github.com/fvanwijk/d3-area-chunked</a></p>
-    <div class='chart-container'></div>
-    <p>
-      <a href="https://github.com/fvanwijk/d3-area-chunked">Code on GitHub</a>
-    </p>
-    <div class='example-gallery'><h2>Example Cases</h2></div>
-    <script src="//d3js.org/d3.v4.min.js"></script>
-    <script src="d3-interpolate-path.js"></script>
-    <script src="d3-area-chunked.js"></script>
-    <script src="example-gallery.js"></script>
-    <script>
-var transitionDuration = 1000;
 
-// shared chart properties
-var x, y, xAxis, yAxis, svg, area, areaWithDefined, width, height;
-var areaColor = '#0bb';
+<head>
+  <title>d3-area-chunked</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="example.css" />
+</head>
 
-/* eslint-disable */
-function generateRandom(length) {
-  var xRandomizer = d3.randomNormal(150, 150);
-  var yRandomizer = d3.randomNormal(-10, 10);
-  var vRandomizer = d3.randomNormal(150, 50);
-  var missingChance = 0.8;
+<body>
+  <h1 class="main-header">d3-area-chunked</h1>
+  <p class="main-link"><a
+      href="https://github.com/fvanwijk/d3-area-chunked">https://github.com/fvanwijk/d3-area-chunked</a></p>
+  <div class='chart-container'></div>
+  <p>
+    <a href="https://github.com/fvanwijk/d3-area-chunked">Code on GitHub</a>
+  </p>
+  <div class='example-gallery'>
+    <h2>Example Cases</h2>
+  </div>
+  <script src="//d3js.org/d3.v6.min.js"></script>
+  <script src="d3-interpolate-path.js"></script>
+  <script src="d3-area-chunked.js"></script>
+  <script src="example-gallery.js"></script>
+  <script>
+    var transitionDuration = 1000;
 
-  return d3.range(length).map(function (i) {
-    return {
-      x: i,
-      y: Math.round(yRandomizer()),
-      v: Math.round(vRandomizer())
+    // shared chart properties
+    var x, y, xAxis, yAxis, svg, area, areaWithDefined, width, height;
+    var areaColor = '#0bb';
+
+    /* eslint-disable */
+    function generateRandom(length) {
+      var xRandomizer = d3.randomNormal(150, 150);
+      var yRandomizer = d3.randomNormal(-10, 10);
+      var vRandomizer = d3.randomNormal(150, 50);
+      var missingChance = 0.8;
+
+      return d3.range(length).map(function (i) {
+        return {
+          x: i,
+          y: Math.round(yRandomizer()),
+          v: Math.round(vRandomizer())
+        }
+      }).map(function (d) {
+        if (Math.random() > missingChance && d.x > 3 && d.x < length - 2) {
+          d.y = undefined;
+        }
+        return d;
+      });
     }
-  }).map(function (d) {
-    if (Math.random() > missingChance && d.x > 3 && d.x < length - 2) {
-      d.y = undefined;
+
+    function setupChart(data) {
+      var margin = { top: 20, right: 30, bottom: 0, left: 55 };
+      width = 800 - margin.left - margin.right;
+      height = 450 - margin.top - margin.bottom;
+      var numGroups = 3;
+      var groupHeight = height / numGroups;
+
+      x = d3
+        .scaleLinear()
+        .domain(d3.extent(data, function (d) { return d.x; }))
+        .range([0, width]);
+
+      y = d3
+        .scaleLinear()
+        .domain(d3.extent(data, function (d) { return d.y; }))
+        .range([0.5 * groupHeight, 0]);
+
+      yAxis = d3.axisLeft(y).ticks(5);
+
+      svg = d3.select('.chart-container').append('svg')
+        .attr('width', width + margin.left + margin.right)
+        .attr('height', height + margin.top + margin.bottom)
+        .append('g')
+        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+
+      area = d3.area()
+        .curve(d3.curveLinear)
+        .x(function (d) { return x(d.x); })
+        .y0(function (d) { return y(0); })
+        .y1(function (d) { return y(d.y); });
+
+      areaWithDefined = d3.area()
+        .curve(d3.curveLinear)
+        .x(function (d) { return x(d.x); })
+        .y0(function (d) { return y(0); })
+        .y1(function (d) { return y(d.y); })
+        .defined(function (d) { return d.y != null; });
+
+      svg.append('g')
+        .attr('class', 'ref-lines');
+
+      const basicArea = svg.append('g')
+        .attr('class', 'basic-area');
+      basicArea.append('text')
+        .text('d3.area')
+        .attr('dy', -8);
+      basicArea.append('g')
+        .attr('class', 'axis')
+        .attr('transform', 'translate(-5, 0)');
+
+      const gBasicAreaDefined = svg.append('g')
+        .attr('class', 'basic-area-defined')
+        .attr('transform', 'translate(0 ' + (groupHeight) + ')');
+      gBasicAreaDefined.append('text')
+        .text('d3.area with defined()')
+        .attr('dy', -8);
+      gBasicAreaDefined.append('g')
+        .attr('class', 'axis')
+        .attr('transform', 'translate(-5, 0)');
+
+      const chunkedArea = svg.append('g')
+        .attr('class', 'chunked-area')
+        .attr('transform', 'translate(0 ' + (2 * groupHeight) + ')');
+      chunkedArea.append('text')
+        .text('d3-area-chunked')
+        .style('font-weight', 'bold')
+        .attr('dy', -8);
+      chunkedArea.append('g')
+        .attr('class', 'axis')
+        .attr('transform', 'translate(-5, 0)');
+
+      d3.select('.chart-container').append('button')
+        .text('New Data')
+        .on('click', function () { updateChart(generateRandom(20)); })
+
+      updateChart(data);
     }
-    return d;
-  });
-}
 
-function setupChart(data) {
-  var margin = {top: 20, right: 30, bottom: 0, left: 55};
-  width = 800 - margin.left - margin.right;
-  height = 450 - margin.top - margin.bottom;
-  var numGroups = 3;
-  var groupHeight = height / numGroups;
+    function renderChunkedArea(lineData, root) {
+      var areaChunked = d3.areaChunked()
+        .x(function (d) { return x(d.x); })
+        .y0(function (d) { return y(0); })
+        .y1(function (d) { return y(d.y); })
+        .curve(d3.curveLinear)
+        .defined(function (d) { return d.y != null; })
+        .areaStyles({
+          fill: '#0bb'
+        });
 
-  x = d3
-      .scaleLinear()
-      .domain(d3.extent(data, function (d) { return d.x; }))
-      .range([0, width]);
+      root
+        .datum(lineData)
+        .transition()
+        .duration(transitionDuration)
+        .call(areaChunked);
+    }
 
-  y = d3
-      .scaleLinear()
-      .domain(d3.extent(data, function (d) { return d.y; }))
-      .range([0.5 * groupHeight, 0]);
+    function renderBasicArea(newData, root, area, showPoints) {
+      // render basic area
+      var basicArea = root.select('.area');
 
-  yAxis = d3.axisLeft(y).ticks(5);
+      if (basicArea.empty()) {
+        basicArea = root.append('path').attr('class', 'area')
+          .style('opacity', 1e-6);
+      }
 
-  svg = d3.select('.chart-container').append('svg')
-      .attr('width', width + margin.left + margin.right)
-      .attr('height', height + margin.top + margin.bottom)
-    .append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
+      basicArea
+        .style('fill', areaColor)
+        .style('stroke-width', 2)
+        .transition()
+        .duration(transitionDuration)
+        .style('opacity', 1)
+        .attr('d', area(newData));
 
-  area = d3.area()
-      .curve(d3.curveLinear)
-      .x(function (d) { return x(d.x); })
-      .y0(function (d) { return y(0); })
-      .y1(function (d) { return y(d.y); });
+      if (showPoints) {
+        var filteredData = newData.filter(function (d) { return d.y != null; });
 
-  areaWithDefined = d3.area()
-      .curve(d3.curveLinear)
-      .x(function (d) { return x(d.x); })
-      .y0(function (d) { return y(0); })
-      .y1(function (d) { return y(d.y); })
-      .defined(function (d) { return d.y != null; });
+        var circleBinding = root.selectAll('circle').data(filteredData);
 
-  svg.append('g')
-      .attr('class', 'ref-lines');
+        var circleEntering = circleBinding.enter()
+          .append('circle')
+          .attr('cx', function (d) { return x(d.x); })
+          .attr('cy', function (d) { return y(d.y); });
 
-  const basicArea = svg.append('g')
-      .attr('class', 'basic-area');
-  basicArea.append('text')
-      .text('d3.area')
-      .attr('dy', -8);
-  basicArea.append('g')
-      .attr('class', 'axis')
-      .attr('transform', 'translate(-5, 0)');
+        circleBinding.merge(circleEntering)
+          .style('stroke', '#fff')
+          .style('fill', areaColor)
+          .transition()
+          .duration(transitionDuration)
+          .attr('r', 3.5)
+          .attr('cx', function (d) { return x(d.x); })
+          .attr('cy', function (d) { return y(d.y); });
 
-  const gBasicAreaDefined = svg.append('g')
-      .attr('class', 'basic-area-defined')
-      .attr('transform', 'translate(0 ' + (groupHeight) + ')');
-  gBasicAreaDefined.append('text')
-      .text('d3.area with defined()')
-      .attr('dy', -8);
-  gBasicAreaDefined.append('g')
-      .attr('class', 'axis')
-      .attr('transform', 'translate(-5, 0)');
+        circleBinding.exit().remove();
+      }
+    }
 
-  const chunkedArea = svg.append('g')
-    .attr('class', 'chunked-area')
-    .attr('transform', 'translate(0 ' + (2 * groupHeight) + ')');
-  chunkedArea.append('text')
-      .text('d3-area-chunked')
-      .style('font-weight', 'bold')
-      .attr('dy', -8);
-  chunkedArea.append('g')
-    .attr('class', 'axis')
-    .attr('transform', 'translate(-5, 0)');
+    function renderRefLines(newData, root) {
+      var filteredData = newData.filter(function (d) { return d.y != null; });
 
-  d3.select('.chart-container').append('button')
-    .text('New Data')
-    .on('click', function () { updateChart(generateRandom(20)); })
+      var binding = root.selectAll('line').data(filteredData);
 
-  updateChart(data);
-}
-
-function renderChunkedArea(lineData, root) {
-  var areaChunked = d3.areaChunked()
-    .x(function (d) { return x(d.x); })
-    .y0(function (d) { return y(0); })
-    .y1(function (d) { return y(d.y); })
-    .curve(d3.curveLinear)
-    .defined(function (d) { return d.y != null; })
-    .areaStyles({
-      fill: '#0bb'
-    });
-
-  root
-    .datum(lineData)
-    .transition()
-    .duration(transitionDuration)
-    .call(areaChunked);
-}
-
-function renderBasicArea(newData, root, area, showPoints) {
-  // render basic area
-  var basicArea = root.select('.area');
-
-  if (basicArea.empty()) {
-    basicArea = root.append('path').attr('class', 'area')
-      .style('opacity', 1e-6);
-  }
-
-  basicArea
-      .style('fill', areaColor)
-      .style('stroke-width', 2)
-      .transition()
-      .duration(transitionDuration)
-      .style('opacity', 1)
-      .attr('d', area(newData));
-
-  if (showPoints) {
-    var filteredData = newData.filter(function (d) { return d.y != null; });
-
-    var circleBinding = root.selectAll('circle').data(filteredData);
-
-    var circleEntering = circleBinding.enter()
-      .append('circle')
-      .attr('cx', function (d) { return x(d.x); })
-      .attr('cy', function (d) { return y(d.y); });
-
-    circleBinding.merge(circleEntering)
-      .style('stroke', '#fff')
-      .style('fill', areaColor)
-      .transition()
-      .duration(transitionDuration)
-      .attr('r', 3.5)
-      .attr('cx', function (d) { return x(d.x); })
-      .attr('cy', function (d) { return y(d.y); });
-
-    circleBinding.exit().remove();
-  }
-}
-
-function renderRefLines(newData, root) {
-  var filteredData = newData.filter(function (d) { return d.y != null; });
-
-  var binding = root.selectAll('line').data(filteredData);
-
-  var entering = binding.enter()
-    .append('line')
-      .style('stroke', 'transparent')
-      .attr('x1', function (d) { return x(d.x); })
-      .attr('x2', function (d) { return x(d.x); });
+      var entering = binding.enter()
+        .append('line')
+        .style('stroke', 'transparent')
+        .attr('x1', function (d) { return x(d.x); })
+        .attr('x2', function (d) { return x(d.x); });
 
 
 
-  binding.merge(entering)
-    .transition()
-    .duration(transitionDuration)
-    .style('stroke', '#f4f4f4')
-    .attr('x1', function (d) { return x(d.x); })
-    .attr('x2', function (d) { return x(d.x); })
-    .attr('y1', 0)
-    .attr('y2', height)
+      binding.merge(entering)
+        .transition()
+        .duration(transitionDuration)
+        .style('stroke', '#f4f4f4')
+        .attr('x1', function (d) { return x(d.x); })
+        .attr('x2', function (d) { return x(d.x); })
+        .attr('y1', 0)
+        .attr('y2', height)
 
-  binding.exit().remove();
-}
+      binding.exit().remove();
+    }
 
-function updateChart(newData) {
-  console.log('Main area using data', newData);
+    function updateChart(newData) {
+      console.log('Main area using data', newData);
 
-  x.domain(d3.extent(newData, function (d) { return d.x; }));
-  y.domain(d3.extent(newData, function (d) { return d.y; }));
+      x.domain(d3.extent(newData, function (d) { return d.x; }));
+      y.domain(d3.extent(newData, function (d) { return d.y; }));
 
-  var gRefLines = svg.select('.ref-lines');
-  renderRefLines(newData, gRefLines);
+      var gRefLines = svg.select('.ref-lines');
+      renderRefLines(newData, gRefLines);
 
-  var filteredData = newData.filter(function (d) { return d.y != null; });
+      var filteredData = newData.filter(function (d) { return d.y != null; });
 
-  var gBasicArea = svg.select('.basic-area');
-  renderBasicArea(filteredData, gBasicArea, area, true);
-  var gBasicAreaDefined = svg.select('.basic-area-defined');
-  renderBasicArea(newData, gBasicAreaDefined, areaWithDefined);
+      var gBasicArea = svg.select('.basic-area');
+      renderBasicArea(filteredData, gBasicArea, area, true);
+      var gBasicAreaDefined = svg.select('.basic-area-defined');
+      renderBasicArea(newData, gBasicAreaDefined, areaWithDefined);
 
-  var gChunkedArea = svg.select('.chunked-area');
-  renderChunkedArea(newData, gChunkedArea);
+      var gChunkedArea = svg.select('.chunked-area');
+      renderChunkedArea(newData, gChunkedArea);
 
-  gBasicArea.select('.axis').transition().duration(transitionDuration).call(yAxis);
-  gBasicAreaDefined.select('.axis').transition().duration(transitionDuration).call(yAxis);
-  gChunkedArea.select('.axis').transition().duration(transitionDuration).call(yAxis);
-}
+      gBasicArea.select('.axis').transition().duration(transitionDuration).call(yAxis);
+      gBasicAreaDefined.select('.axis').transition().duration(transitionDuration).call(yAxis);
+      gChunkedArea.select('.axis').transition().duration(transitionDuration).call(yAxis);
+    }
 
-// create the chart
-setupChart(generateRandom(20));
+    // create the chart
+    setupChart(generateRandom(20));
 
 
 
   </script>
 </body>
+
 </html>
