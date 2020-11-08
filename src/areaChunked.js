@@ -822,10 +822,10 @@ export default function render() {
 
     // initial render
     if (clipPath.empty()) {
-      counter += 1;
       clipPath = defs.append('clipPath')
         .attr('class', className)
         .attr('id', `d3-area-chunked-clip-${chunkName}-${counter}`);
+      counter += 1;
     }
 
     return clipPath.attr('id');
