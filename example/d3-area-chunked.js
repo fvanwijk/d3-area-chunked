@@ -944,8 +944,8 @@
       var clipPath = defs.select(".".concat(className)); // initial render
 
       if (clipPath.empty()) {
-        counter += 1;
         clipPath = defs.append('clipPath').attr('class', className).attr('id', "d3-area-chunked-clip-".concat(chunkName, "-").concat(counter));
+        counter += 1;
       }
 
       return clipPath.attr('id');
