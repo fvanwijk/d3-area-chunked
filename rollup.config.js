@@ -17,6 +17,6 @@ export default {
   external: Object.keys(globals),
   output: [
     { extend: true, name: 'd3', format: 'umd', file: 'build/d3-area-chunked.js', globals, },
-    { extend: true, name: 'd3', format: 'umd', file: 'example/d3-area-chunked.js', globals, },
+    { extend: true, name: 'd3', format: 'umd', file: 'docs/d3-area-chunked.js', globals, },
   ]
 };
