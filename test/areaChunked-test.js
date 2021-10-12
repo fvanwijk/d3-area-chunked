@@ -1,9 +1,9 @@
 /* eslint-disable */
-const tape = require('tape');
-const transition = require('d3-transition');
-const select = require('d3-selection').select;
-const jsdom = require('jsdom');
-const areaChunked = require('../').areaChunked;
+import { transition } from 'd3-transition';
+import tape from 'tape';
+import { select } from 'd3-selection';
+import jsdom from 'jsdom';
+import areaChunked from '../src/areaChunked.js'
 
 const definedAreaClass = '.d3-area-chunked-defined';
 const undefinedAreaClass = '.d3-area-chunked-undefined';
