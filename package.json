@@ -17,7 +17,12 @@
     "svg"
   ],
   "license": "BSD-3-Clause",
-  "main": "build/d3-area-chunked.js",
+  "module": "./index.js",
+  "main": "./index.js",
+  "exports": {
+    "umd": "./build/d3-area-chunked.min.js",
+    "default": "./index.js"
+  },
   "jsnext:main": "index",
   "homepage": "https://github.com/fvanwijk/d3-area-chunked",
   "repository": {
