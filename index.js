@@ -1,3 +1,3 @@
 export {
   default as areaChunked,
-} from './src/areaChunked';
+} from './src/areaChunked.js';
